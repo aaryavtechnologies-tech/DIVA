@@ -265,7 +265,16 @@ function initPayment(){
     try{
       const edgeResponse = await fetch(`${window.DivaConfig.EDGE_FUNCTIONS_URL}/create-razorpay-order`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // Supabase Edge Functions require a Bearer token at the gateway
+          // level (separate from your own app logic) or every call 401s
+          // before your function code runs. The anon key is safe to send
+          // here — it's the same public key already in supabase-client.js,
+          // and it does NOT grant the function any elevated access; the
+          // function still authenticates Razorpay itself server-side.
+          "Authorization": `Bearer ${window.DivaConfig.SUPABASE_ANON_KEY}`
+        },
         body: JSON.stringify({ orderNumber: result.orderNumber })
       });
 

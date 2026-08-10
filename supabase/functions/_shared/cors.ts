@@ -14,6 +14,8 @@
 const ALLOWED_ORIGINS = [
   "https://divajewels.shop",
   "https://www.divajewels.shop",
+  // TODO: remove before going live — local testing only.
+  "http://localhost:8000",
 ];
 
 /** Returns the right Access-Control-Allow-Origin value for this request's
