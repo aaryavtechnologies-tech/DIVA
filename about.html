@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Story — Diva Jewels</title>
+<meta name="description" content="Diva Jewels is a small studio designing jewelry meant for daily wear — learn about our approach to craft, materials and care.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com data:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="announce">
+  <div class="wrap">
+    <button class="announce-nav" data-announce-prev aria-label="Previous announcement">‹</button>
+    <div class="announce-track">
+      <span class="active">Free shipping on orders over ₹1,999</span>
+      <span>Handcrafted in small batches</span>
+      <span>Easy 7-day returns</span>
+    </div>
+    <button class="announce-nav" data-announce-next aria-label="Next announcement">›</button>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <span class="brand-badge"><img src="assets/logo.png" alt="Diva Jewels crest"></span>
+      <span class="brand-word">Diva<small>Jewels</small></span>
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="products.html">Shop</a>
+      <a href="about.html" class="active">Our Story</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <a class="icon-btn" href="cart.html" aria-label="View cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+        <span class="cart-count" data-cart-count>0</span>
+      </a>
+      <div class="account-menu" data-account-menu>
+        <button type="button" class="account-trigger" aria-label="Account" aria-expanded="false" data-account-trigger>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7.5" r="4"/></svg>
+        </button>
+        <div class="account-dropdown" data-account-dropdown></div>
+      </div>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="wrap">
+    <span class="eyebrow">Our Story</span>
+    <h1>Made Slowly, Worn Daily</h1>
+    <p class="breadcrumb"><a href="index.html">Home</a> / Our Story</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="about-hero">
+      <div>
+        <span class="eyebrow">How We Started</span>
+        <h2>A Studio Built Around Everyday Sparkle</h2>
+        <p>Diva Jewels began with a simple frustration: fine jewelry was either too delicate to wear daily, or too formal to reach for on an ordinary Tuesday. We wanted pieces that could do both — dress up a plain outfit and survive a full day of wear.</p>
+        <p>Every design starts as a sketch on paper before it's sampled, tested and refined. We work in small batches rather than mass production, which means a little more waiting, but a lot more care in every piece that reaches you.</p>
+        <a href="products.html" class="btn btn-primary">Shop the Collection</a>
+      </div>
+      <img src="https://images.unsplash.com/photo-1650455221359-3aebf920bcc5?auto=format&fit=crop&w=900&q=80" alt="A curated tray of gold jewelry pieces">
+    </div>
+  </div>
+</section>
+
+<section class="bg-deep">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">What We Believe</span>
+      <h2>Our Approach to Craft</h2>
+      <div class="facet-divider">
+        <svg viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M6 2 2 8l10 8 10-8-4-6z"/><path d="M2 8h20M8 2l4 6-4 8M16 2l-4 6 4 8"/></svg>
+      </div>
+    </div>
+    <div class="value-grid">
+      <div class="value-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/></svg>
+        <h3>Designed for Daily Wear</h3>
+        <p>We test every piece for comfort and durability before it goes into production — jewelry should keep up with your life, not sit in a box.</p>
+      </div>
+      <div class="value-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 3"/></svg>
+        <h3>Made in Small Batches</h3>
+        <p>We produce in limited runs so quality control stays tight and every piece gets real attention before it ships.</p>
+      </div>
+      <div class="value-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+        <h3>Honest Materials</h3>
+        <p>Clear, upfront descriptions of what each piece is made from, so you always know exactly what you're buying.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap center">
+    <span class="brand-badge" style="margin:0 auto 20px; width:64px; height:64px; border-radius:16px;">
+      <img src="assets/logo.png" alt="Diva Jewels crest" style="width:46px;height:46px;">
+    </span>
+    <h2 style="max-width:640px;margin:0 auto 14px;">Thank You for Being Here</h2>
+    <p style="max-width:560px;margin:0 auto;">Whether you're shopping for yourself or someone else, we hope every Diva Jewels piece becomes something you reach for often — not something you save for someday.</p>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <a class="brand" href="index.html" style="margin-bottom:14px;">
+          <span class="brand-badge"><img src="assets/logo.png" alt="Diva Jewels crest"></span>
+          <span class="brand-word">Diva<small>Jewels</small></span>
+        </a>
+        <p>Handcrafted jewelry in cream, gold and light — designed to be worn often and kept for years.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="products.html#Necklaces">Necklaces</a></li>
+          <li><a href="products.html#Rings">Rings</a></li>
+          <li><a href="products.html#Earrings">Earrings</a></li>
+          <li><a href="products.html#Bracelets">Bracelets</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">Our Story</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="cart.html">Your Bag</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Customer Care</h4>
+        <ul>
+          <li><a href="contact.html">Shipping &amp; Returns</a></li>
+          <li><a href="contact.html">Track an Order</a></li>
+          <li><a href="contact.html">FAQs</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Diva Jewels. All rights reserved.</span>
+      <span>Payments secured &amp; encrypted at checkout</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/products-data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

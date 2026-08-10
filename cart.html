@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Bag — Diva Jewels</title>
+<meta name="description" content="Review your bag and check out securely.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com data:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <span class="brand-badge"><img src="assets/logo.png" alt="Diva Jewels crest"></span>
+      <span class="brand-word">Diva<small>Jewels</small></span>
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="products.html">Shop</a>
+      <a href="about.html">Our Story</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <a class="icon-btn" href="cart.html" aria-label="View cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+        <span class="cart-count" data-cart-count>0</span>
+      </a>
+      <div class="account-menu" data-account-menu>
+        <button type="button" class="account-trigger" aria-label="Account" aria-expanded="false" data-account-trigger>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7.5" r="4"/></svg>
+        </button>
+        <div class="account-dropdown" data-account-dropdown></div>
+      </div>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="wrap">
+    <span class="eyebrow">Checkout</span>
+    <h1>Your Bag</h1>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+
+    <div class="auth-checking" data-auth-checking>Checking your session…</div>
+
+    <div class="hidden" data-cart-authgate>
+    <div class="account-bar" data-account-bar></div>
+
+    <div class="checkout-steps">
+      <div class="step active" data-step-label="cart"><span class="dot">1</span> Bag</div>
+      <div class="step" data-step-label="address"><span class="dot">2</span> Delivery Address</div>
+      <div class="step" data-step-label="pay"><span class="dot">3</span> Payment</div>
+    </div>
+
+    <!-- STEP 1: CART -->
+    <div data-step="cart">
+      <div class="cart-empty" data-cart-empty>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+        <h3>Your bag is empty</h3>
+        <p>Browse the collection and add a piece you love.</p>
+        <a href="products.html" class="btn btn-primary">Shop Now</a>
+      </div>
+
+      <div class="cart-layout hidden" data-cart-layout>
+        <div>
+          <div data-cart-list></div>
+        </div>
+        <div class="summary-card">
+          <h3 style="margin-bottom:18px;">Order Summary</h3>
+          <div class="summary-row"><span>Subtotal</span><span data-subtotal>₹0</span></div>
+          <div class="summary-row"><span>Shipping</span><span data-shipping>Free</span></div>
+          <div class="summary-row total"><span>Total</span><span data-total>₹0</span></div>
+          <button class="btn btn-primary btn-block" data-to-address style="margin-top:14px;">Proceed to Checkout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: ADDRESS -->
+    <div data-step="address" class="hidden">
+      <div class="cart-layout">
+        <div>
+          <h3 style="margin-bottom:20px;">Delivery Address</h3>
+          <form id="address-form" novalidate>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="a-name">Full Name</label>
+                <input type="text" id="a-name" name="name" required autocomplete="name">
+              </div>
+              <div class="form-field">
+                <label for="a-phone">Phone Number</label>
+                <input type="tel" id="a-phone" name="phone" required inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel">
+              </div>
+              <div class="form-field full">
+                <label for="a-email">Email</label>
+                <input type="email" id="a-email" name="email" required autocomplete="email">
+              </div>
+              <div class="form-field full">
+                <label for="a-address1">Address Line 1</label>
+                <input type="text" id="a-address1" name="address1" required autocomplete="address-line1">
+              </div>
+              <div class="form-field full">
+                <label for="a-address2">Address Line 2 <span style="text-transform:none;font-weight:400;">(optional)</span></label>
+                <input type="text" id="a-address2" name="address2" autocomplete="address-line2">
+              </div>
+              <div class="form-field">
+                <label for="a-city">City</label>
+                <input type="text" id="a-city" name="city" required autocomplete="address-level2">
+              </div>
+              <div class="form-field">
+                <label for="a-state">State</label>
+                <input type="text" id="a-state" name="state" required autocomplete="address-level1">
+              </div>
+              <div class="form-field">
+                <label for="a-pincode">Pincode</label>
+                <input type="text" id="a-pincode" name="pincode" required inputmode="numeric" maxlength="6" placeholder="6-digit pincode" autocomplete="postal-code">
+              </div>
+              <div class="form-field">
+                <label for="a-country">Country</label>
+                <select id="a-country" name="country" required autocomplete="country-name">
+                  <option value="India" selected>India</option>
+                  <option value="United States">United States</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="Canada">Canada</option>
+                  <option value="Australia">Australia</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex; gap:14px; margin-top:6px;">
+              <button type="button" class="btn btn-outline" data-back-to-cart>Back to Bag</button>
+              <button type="submit" class="btn btn-primary">Continue to Payment</button>
+            </div>
+          </form>
+        </div>
+        <div class="summary-card">
+          <h3 style="margin-bottom:18px;">Order Summary</h3>
+          <div class="summary-row"><span>Subtotal</span><span data-subtotal>₹0</span></div>
+          <div class="summary-row"><span>Shipping</span><span data-shipping>Free</span></div>
+          <div class="summary-row total"><span>Total</span><span data-total>₹0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: PAYMENT -->
+    <div data-step="pay" class="hidden">
+      <div class="cart-layout">
+        <div>
+          <h3 style="margin-bottom:16px;">Deliver To</h3>
+          <div class="summary-card" style="margin-bottom:22px;">
+            <div data-address-review></div>
+            <button type="button" class="remove-link" data-back-to-address style="margin-top:10px;">Edit address</button>
+          </div>
+          <p class="form-note">Clicking "Pay" saves your order securely to our system first, so it's never lost — even before payment is confirmed. You'll then be handed off to Razorpay to complete payment.</p>
+        </div>
+        <div class="summary-card">
+          <h3 style="margin-bottom:18px;">Order Summary</h3>
+          <div class="summary-row"><span>Subtotal</span><span data-subtotal>₹0</span></div>
+          <div class="summary-row"><span>Shipping</span><span data-shipping>Free</span></div>
+          <div class="summary-row total"><span>Total</span><span data-total>₹0</span></div>
+          <button class="btn btn-gold btn-block" data-pay-btn style="margin-top:14px;">Pay <span data-pay-amount>₹0</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: CONFIRMATION -->
+    <div data-step="confirmed" class="hidden">
+      <div class="cart-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 12l5 5L20 6"/></svg>
+        <h3>Order Received</h3>
+        <p>Order <strong data-confirm-order-number></strong> for <strong data-confirm-total></strong> has been saved. You'll receive a confirmation once payment is set up and confirmed.</p>
+        <a href="products.html" class="btn btn-primary">Continue Shopping</a>
+      </div>
+    </div>
+
+    </div><!-- /[data-cart-authgate] -->
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-bottom" style="border-top:none; padding-top:0;">
+      <span>© 2026 Diva Jewels. All rights reserved.</span>
+      <span>Payments secured &amp; encrypted at checkout</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/products-data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/checkout.js"></script>
+<!-- Uncomment once you have a Razorpay key configured server-side:
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+-->
+</body>
+</html>

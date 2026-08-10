@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Sign In — Diva Jewels</title>
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com; connect-src 'self' https://*.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none';">
+<link rel="icon" type="image/png" href="../assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+<div class="admin-auth-screen">
+  <div class="admin-auth-card">
+    <div class="admin-auth-brand">
+      <img src="../assets/logo.png" alt="Diva Jewels crest">
+      <span class="word">Diva<small>Jewels — Admin</small></span>
+    </div>
+    <div class="admin-auth-eyebrow">Staff Access Only</div>
+    <h1>Admin Sign In</h1>
+
+    <div class="form-status" data-status></div>
+
+    <form id="admin-login-form" novalidate>
+      <div class="form-field">
+        <label for="a-email">Email</label>
+        <input type="email" id="a-email" name="email" required autocomplete="username">
+      </div>
+      <div class="form-field">
+        <label for="a-password">Password</label>
+        <input type="password" id="a-password" name="password" required minlength="6" autocomplete="current-password">
+      </div>
+      <p class="auth-forgot"><a href="#" data-forgot-link>Forgot password?</a></p>
+      <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+    </form>
+
+    <!-- Forgot-password mini form, hidden until "Forgot password?" is clicked -->
+    <form id="admin-forgot-form" class="hidden" novalidate>
+      <p class="form-note" style="margin-bottom:16px;">Enter your admin email — we'll send a reset link.</p>
+      <div class="form-field">
+        <label for="f-email">Email</label>
+        <input type="email" id="f-email" name="email" required autocomplete="username">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Send Reset Link</button>
+      <button type="button" class="btn btn-outline btn-block" style="margin-top:10px;" data-cancel-forgot>Back to Sign In</button>
+    </form>
+
+    <a class="admin-back-link" href="../index.html">← Back to Diva Jewels</a>
+  </div>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-client.js"></script>
+<script src="js/admin-client.js"></script>
+<script>
+function setStatus(msg, ok){
+  const el = document.querySelector("[data-status]");
+  el.textContent = msg;
+  el.className = "form-status show " + (ok ? "ok" : "err");
+}
+function clearStatus(){
+  const el = document.querySelector("[data-status]");
+  el.className = "form-status";
+  el.textContent = "";
+}
+
+// If already signed in as an admin, skip straight to the dashboard.
+(async () => {
+  const { isAdmin } = await window.DivaAdmin.adminCheckSession();
+  if(isAdmin) window.location.href = "dashboard.html";
+})();
+
+document.querySelector("#admin-login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  clearStatus();
+  const form = e.target;
+  const email = form.email.value.trim();
+  const password = form.password.value;
+  const btn = form.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = "Signing in…";
+
+  const result = await window.DivaAdmin.adminSignIn({ email, password });
+  if(!result.ok){
+    btn.disabled = false;
+    btn.textContent = "Sign In";
+    setStatus(result.error || "Could not sign in.", false);
+    return;
+  }
+
+  const check = await window.DivaAdmin.adminCheckSession();
+  if(!check.isAdmin){
+    await window.DivaAdmin.adminSignOut();
+    btn.disabled = false;
+    btn.textContent = "Sign In";
+    setStatus("This account doesn't have admin access.", false);
+    return;
+  }
+
+  window.location.href = "dashboard.html";
+});
+
+document.querySelector("[data-forgot-link]").addEventListener("click", (e) => {
+  e.preventDefault();
+  clearStatus();
+  document.querySelector("#admin-login-form").classList.add("hidden");
+  document.querySelector("#admin-forgot-form").classList.remove("hidden");
+});
+document.querySelector("[data-cancel-forgot]").addEventListener("click", () => {
+  clearStatus();
+  document.querySelector("#admin-forgot-form").classList.add("hidden");
+  document.querySelector("#admin-login-form").classList.remove("hidden");
+});
+document.querySelector("#admin-forgot-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  clearStatus();
+  const form = e.target;
+  const email = form.email.value.trim();
+  const btn = form.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+
+  const result = await window.DivaAdmin.adminSendPasswordReset(email);
+
+  btn.disabled = false;
+  btn.textContent = "Send Reset Link";
+  if(result.ok){
+    setStatus("If that email has admin access, a reset link is on its way.", true);
+    form.reset();
+  }else{
+    setStatus(result.error || "Could not send the reset link.", false);
+  }
+});
+</script>
+</body>
+</html>
