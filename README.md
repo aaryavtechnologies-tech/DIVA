@@ -98,30 +98,31 @@ Nothing to build here.
    Google, then back to Supabase, then back to this site with the user
    signed in.
 
-## 4. Attach Razorpay (when you're ready)
+## 4. Razorpay (already wired up — just add your keys)
 
-Razorpay order creation requires your **Key Secret**, which must never be
-placed in frontend code. The recommended flow:
+Razorpay is fully integrated via two Supabase Edge Functions in
+`supabase/functions/`, so your `KEY_SECRET` never touches frontend code
+or Cloudflare. `cart.html` and `js/checkout.js` already call them.
 
-1. Write a Supabase Edge Function `create-razorpay-order` that:
-   - receives an order id from the browser,
-   - calls Razorpay's Orders API using your `KEY_ID` + `KEY_SECRET`,
-   - returns the `razorpay_order_id` (and your public `KEY_ID`) to the browser.
-2. In `cart.html`, uncomment:
-   ```html
-   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-   ```
-3. In `js/checkout.js`, find the `// --- Razorpay handoff ---` comment block
-   inside `initPayment()` — it shows exactly where to call your edge
-   function and open the Razorpay checkout widget.
-4. Write a second Edge Function `razorpay-webhook` that verifies Razorpay's
-   signature server-side and updates `orders.payment_status` to `'paid'` or
-   `'failed'`. **This step is what guarantees no paid order is ever missed**,
-   even if the customer's browser crashes right after paying — the webhook
-   fires from Razorpay's servers independent of the browser.
+**See [`RAZORPAY-SETUP.md`](RAZORPAY-SETUP.md) for the full step-by-step**
+(install Supabase CLI, set secrets, deploy functions, configure the
+webhook). Short version:
 
-Never trust a payment "success" callback fired only in the browser — always
-confirm it server-side via the webhook before treating an order as paid.
+```bash
+supabase link --project-ref xpcaxdqhwpvqxtevmors
+supabase secrets set RAZORPAY_KEY_ID=rzp_test_XXXXXXXXXXXXX
+supabase secrets set RAZORPAY_KEY_SECRET=your_key_secret
+supabase functions deploy create-razorpay-order
+supabase functions deploy razorpay-webhook --no-verify-jwt
+```
+
+Then add a webhook in the Razorpay dashboard pointing at
+`https://xpcaxdqhwpvqxtevmors.supabase.co/functions/v1/razorpay-webhook`
+and set `RAZORPAY_WEBHOOK_SECRET` from the value it gives you.
+
+Never trust a payment "success" callback fired only in the browser —
+`payment_status` is only ever set to `'paid'` by the signature-verified
+`razorpay-webhook` function, never by the customer's browser.
 
 ## 5. Build the admin panel
 

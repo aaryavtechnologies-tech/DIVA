@@ -243,43 +243,83 @@ function initPayment(){
     }
 
     // --- Razorpay handoff -------------------------------------------------
-    // Razorpay order creation requires your KEY_SECRET, which must never
-    // live in frontend code. Create it server-side (a Supabase Edge Function
-    // is a good fit) and return { razorpayOrderId, keyId } to the browser,
-    // then open checkout like this:
-    //
-    // const rzp = new Razorpay({
-    //   key: keyId,
-    //   amount: total * 100,
-    //   currency: "INR",
-    //   order_id: razorpayOrderId,
-    //   name: "Diva Jewels",
-    //   prefill: { name: orderPayload.customer.name, email: orderPayload.customer.email, contact: orderPayload.customer.phone },
-    //   handler: function(response){ /* verify signature server-side, then mark order paid */ },
-    // });
-    // rzp.open();
-
+    // The Razorpay Key Secret never touches this file or any frontend code.
+    // We call our own Supabase Edge Function (create-razorpay-order), which
+    // holds RAZORPAY_KEY_ID/KEY_SECRET as server-side secrets, re-reads the
+    // order total from the database (so a tampered request can't underpay),
+    // and returns only what the browser needs: a Razorpay order id + the
+    // public Key ID. Payment is only ever marked "paid" by the signature-
+    // verified razorpay-webhook function — never by this browser code —
+    // so a customer's browser could never fake a successful payment.
     if(typeof Razorpay === "undefined"){
-      // No live Razorpay key yet — run the simulated payment modal so the
-      // demo still feels like a real checkout. This is UI-only: it does
-      // NOT flip orders.payment_status in the database. That's deliberate
-      // — RLS only allows admins to update orders (see schema.sql), so a
-      // customer's browser could never do this even if we tried, and once
-      // real Razorpay is wired up payment_status must only ever be set by
-      // the signature-verified webhook, never the browser. The order sits
-      // as "pending" until an admin (or the future webhook) confirms it.
+      // Razorpay's checkout.js <script> tag isn't loaded (see cart.html) —
+      // fall back to the simulated payment modal so the demo still feels
+      // like a real checkout. This never touches payment_status.
       await runDummyPaymentModal();
-
       goToStep("confirmed");
       renderConfirmation(result.orderNumber, total, { paid: true });
       Cart.clear();
       return;
     }
 
-    showToast(`Order ${result.orderNumber} saved — connect your Razorpay key in js/checkout.js to accept payment.`);
-    goToStep("confirmed");
-    renderConfirmation(result.orderNumber, total, { paid: false });
-    Cart.clear();
+    try{
+      const edgeResponse = await fetch(`${window.DivaConfig.EDGE_FUNCTIONS_URL}/create-razorpay-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderNumber: result.orderNumber })
+      });
+
+      if(!edgeResponse.ok){
+        const errBody = await edgeResponse.json().catch(() => ({}));
+        throw new Error(errBody.error || "Could not start payment.");
+      }
+
+      const { razorpayOrderId, keyId, amount, currency } = await edgeResponse.json();
+
+      const rzp = new Razorpay({
+        key: keyId,
+        amount,
+        currency,
+        order_id: razorpayOrderId,
+        name: "Diva Jewels",
+        description: `Order ${result.orderNumber}`,
+        prefill: {
+          name: orderPayload.customer.name,
+          email: orderPayload.customer.email,
+          contact: orderPayload.customer.phone
+        },
+        theme: { color: "#b8975a" },
+        handler: function(){
+          // This fires as soon as Razorpay's checkout reports success in
+          // the BROWSER. It's optimistic UI only — the razorpay-webhook
+          // edge function is the source of truth and is what actually
+          // flips payment_status to 'paid' after verifying the payment
+          // server-side. If the webhook hasn't landed yet when the admin
+          // looks, the order briefly shows "pending" — that's expected
+          // and safe, never a lost order.
+          goToStep("confirmed");
+          renderConfirmation(result.orderNumber, total, { paid: true });
+          Cart.clear();
+        },
+        modal: {
+          ondismiss: function(){
+            // Customer closed the Razorpay widget without paying. The
+            // order row still exists as "pending" — nothing lost, they
+            // can retry from their orders page or we can follow up.
+            showToast("Payment cancelled — your order is saved and still waiting on payment.");
+          }
+        }
+      });
+
+      rzp.on("payment.failed", function(){
+        showToast("Payment failed — please try again or use a different method.");
+      });
+
+      rzp.open();
+    } catch(err){
+      console.error("Razorpay handoff error:", err);
+      showToast(err.message || "We couldn't start payment — please try again.");
+    }
   });
 }
 

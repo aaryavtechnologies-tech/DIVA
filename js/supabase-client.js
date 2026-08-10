@@ -19,8 +19,15 @@ const SUPABASE_URL = "https://xpcaxdqhwpvqxtevmors.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY2F4ZHFod3B2cXh0ZXZtb3JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzMzkyMTQsImV4cCI6MjEwMTkxNTIxNH0.Yc4U2W-UE23UhwHbn3N8gIJj-ZA-GzK45sSStSs1rV0";
 
 // Exposed so admin/js/admin-client.js can build its own client against the
-// same project without duplicating the URL/key in a second place.
-window.DivaConfig = { SUPABASE_URL, SUPABASE_ANON_KEY };
+// same project without duplicating the URL/key in a second place. Edge
+// Functions (create-razorpay-order, razorpay-webhook) live under this same
+// project at /functions/v1/<name> — derived here so there's only one place
+// that ever needs to know the project URL.
+window.DivaConfig = {
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
+  EDGE_FUNCTIONS_URL: `${SUPABASE_URL}/functions/v1`
+};
 
 let supabaseClient = null;
 
