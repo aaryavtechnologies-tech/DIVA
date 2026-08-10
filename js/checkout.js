@@ -242,6 +242,20 @@ function initPayment(){
       return;
     }
 
+    if(result.demo){
+      // Supabase client never actually initialized (see supabase-client.js
+      // createOrder()) — nothing was saved to the database, so calling the
+      // real Razorpay edge function next would always 404. Surface this
+      // clearly instead of silently attempting a payment for an order that
+      // doesn't exist server-side.
+      console.warn("Order was captured in demo mode only (Supabase not configured) — skipping real Razorpay flow.");
+      showToast("Payments aren't configured yet — this was a local demo checkout only.");
+      goToStep("confirmed");
+      renderConfirmation(result.orderNumber, total, { paid: false });
+      Cart.clear();
+      return;
+    }
+
     // --- Razorpay handoff -------------------------------------------------
     // The Razorpay Key Secret never touches this file or any frontend code.
     // We call our own Supabase Edge Function (create-razorpay-order), which
