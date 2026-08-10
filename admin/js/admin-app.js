@@ -135,10 +135,10 @@ function paintOrders(list){
     const nameDiv = document.createElement("div");
     nameDiv.textContent = order.customer_name;
     const emailDiv = document.createElement("div");
-    emailDiv.style.cssText = "font-size:.78rem;color:var(--ink-soft);";
+    emailDiv.classList.add("u-meta-line");
     emailDiv.textContent = order.customer_email;
     const phoneDiv = document.createElement("div");
-    phoneDiv.style.cssText = "font-size:.78rem;color:var(--ink-soft);";
+    phoneDiv.classList.add("u-meta-line");
     phoneDiv.textContent = order.customer_phone;
     custTd.append(nameDiv, emailDiv, phoneDiv);
 
@@ -190,7 +190,7 @@ function paintOrders(list){
     statusTd.appendChild(select);
 
     const dateTd = document.createElement("td");
-    dateTd.style.cssText = "font-size:.8rem;color:var(--ink-soft);white-space:nowrap;";
+    dateTd.classList.add("u-meta-date");
     dateTd.textContent = formatDate(order.created_at);
 
     tr.append(orderNumTd, custTd, itemsTd, addrTd, totalTd, paymentTd, statusTd, dateTd);
@@ -264,11 +264,11 @@ function paintInquiries(list){
     subjectTd.textContent = msg.subject || "—";
 
     const messageTd = document.createElement("td");
-    messageTd.style.cssText = "max-width:320px;white-space:pre-wrap;";
+    messageTd.classList.add("u-meta-line-wrap");
     messageTd.textContent = msg.message;
 
     const dateTd = document.createElement("td");
-    dateTd.style.cssText = "font-size:.8rem;color:var(--ink-soft);white-space:nowrap;";
+    dateTd.classList.add("u-meta-date");
     dateTd.textContent = formatDate(msg.created_at);
 
     tr.append(nameTd, emailTd, subjectTd, messageTd, dateTd);
@@ -355,6 +355,12 @@ function paintProducts(list){
     img.src = product.image_url || "../assets/logo.png";
     img.alt = product.name;
     imgTd.appendChild(img);
+    if(product.video_url){
+      const vBadge = document.createElement("span");
+      vBadge.className = "admin-video-badge";
+      vBadge.textContent = "▶ video";
+      imgTd.appendChild(vBadge);
+    }
 
     const nameTd = document.createElement("td");
     const strong = document.createElement("strong");
@@ -368,7 +374,7 @@ function paintProducts(list){
     priceTd.textContent = inr(product.price) + (product.compare_at ? " " : "");
     if(product.compare_at){
       const was = document.createElement("span");
-      was.style.cssText = "text-decoration:line-through;color:var(--ink-soft);font-size:.78rem;margin-left:6px;";
+      was.classList.add("u-strike");
       was.textContent = inr(product.compare_at);
       priceTd.appendChild(was);
     }
@@ -380,7 +386,7 @@ function paintProducts(list){
     statusTd.appendChild(statusSpan);
 
     const updatedTd = document.createElement("td");
-    updatedTd.style.cssText = "font-size:.8rem;color:var(--ink-soft);white-space:nowrap;";
+    updatedTd.classList.add("u-meta-date");
     updatedTd.textContent = formatDate(product.updated_at || product.created_at);
 
     const actionsTd = document.createElement("td");
@@ -423,10 +429,12 @@ function openProductModal(product){
   form.reset();
   pendingUploadedImageUrl = null;
   document.querySelector("[data-upload-status]").textContent = "";
+  document.querySelector("[data-video-upload-status]").textContent = "";
   document.querySelector("[data-product-form-status]").textContent = "";
   document.querySelector("[data-product-form-status]").className = "form-status";
 
   const preview = document.querySelector("[data-image-preview]");
+  const videoPreview = document.querySelector("[data-video-preview]");
 
   if(product){
     document.querySelector("[data-product-modal-title]").textContent = "Edit Product";
@@ -437,14 +445,18 @@ function openProductModal(product){
     form.querySelector('[data-field="price"]').value = product.price;
     form.querySelector('[data-field="compareAt"]').value = product.compare_at ?? "";
     form.querySelector('[data-field="imageUrl"]').value = product.image_url || "";
+    form.querySelector('[data-field="videoUrl"]').value = product.video_url || "";
     form.querySelector('[data-field="description"]').value = product.description || "";
     if(product.image_url){ preview.src = product.image_url; preview.classList.remove("hidden"); }
     else preview.classList.add("hidden");
+    if(product.video_url){ videoPreview.src = product.video_url; videoPreview.classList.remove("hidden"); }
+    else videoPreview.classList.add("hidden");
   }else{
     document.querySelector("[data-product-modal-title]").textContent = "Add Product";
     form.querySelector('[data-field="id"]').value = "";
     form.querySelector('[data-field="active"]').checked = true;
     preview.classList.add("hidden");
+    videoPreview.classList.add("hidden");
   }
 
   modal.classList.remove("hidden");
@@ -499,6 +511,32 @@ function initProductModal(){
     else preview.classList.add("hidden");
   });
 
+  // Video upload → Supabase Storage, fills the URL field + preview.
+  document.querySelector("[data-video-file]").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const status = document.querySelector("[data-video-upload-status]");
+    status.textContent = "Uploading…";
+    const res = await window.DivaAdmin.adminUploadProductVideo(file);
+    if(res.ok){
+      getProductForm().querySelector('[data-field="videoUrl"]').value = res.url;
+      const preview = document.querySelector("[data-video-preview]");
+      preview.src = res.url;
+      preview.classList.remove("hidden");
+      status.textContent = "Uploaded ✓";
+    }else{
+      status.textContent = "Upload failed: " + (res.error || "unknown error");
+    }
+    e.target.value = "";
+  });
+
+  // Live preview when a video URL is pasted by hand.
+  getProductForm().querySelector('[data-field="videoUrl"]').addEventListener("input", (e) => {
+    const preview = document.querySelector("[data-video-preview]");
+    if(e.target.value.trim()){ preview.src = e.target.value.trim(); preview.classList.remove("hidden"); }
+    else preview.classList.add("hidden");
+  });
+
   getProductForm().addEventListener("submit", async (e) => {
     e.preventDefault();
     const form = getProductForm();
@@ -512,6 +550,7 @@ function initProductModal(){
     const compareAtRaw = form.querySelector('[data-field="compareAt"]').value;
     const compareAt = compareAtRaw === "" ? null : Number(compareAtRaw);
     const imageUrl = form.querySelector('[data-field="imageUrl"]').value.trim();
+    const videoUrl = form.querySelector('[data-field="videoUrl"]').value.trim();
     const description = form.querySelector('[data-field="description"]').value.trim();
     const active = form.querySelector('[data-field="active"]').checked;
 
@@ -525,6 +564,7 @@ function initProductModal(){
       name, category, price,
       compare_at: compareAt,
       image_url: imageUrl,
+      video_url: videoUrl || null,
       description,
       active
     };

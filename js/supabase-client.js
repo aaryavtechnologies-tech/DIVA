@@ -91,12 +91,22 @@ async function createOrder(order){
     return { ok: true, orderNumber, id: null, demo: true };
   }
 
-  const { data, error } = await client.from("orders").insert(payload).select("id, order_number").single();
+  // Deliberately NOT chaining .select() here. PostgREST performs an
+  // insert-with-RETURNING as one statement, and Postgres RLS applies the
+  // table's SELECT policy to that RETURNING data too — not just the INSERT
+  // policy. This table only grants SELECT to admins and to a signed-in
+  // customer reading their OWN row (user_id = auth.uid()), so for a guest
+  // checkout (no session) the insert itself succeeds but the attempted
+  // "read the row back" step is rejected by RLS as a 403, which looks like
+  // the order failed even though it was saved. We already generated
+  // orderNumber client-side above, so there's nothing we need back from
+  // the database — just insert and report success from the write alone.
+  const { error } = await client.from("orders").insert(payload);
   if(error){
     console.error("Supabase createOrder error:", error);
     return { ok: false, error: error.message };
   }
-  return { ok: true, orderNumber: data.order_number, id: data.id };
+  return { ok: true, orderNumber };
 }
 
 /** Updates an order's payment status once Razorpay confirms (call this from
@@ -247,13 +257,36 @@ async function fetchProducts(){
     price: Number(p.price),
     compareAt: p.compare_at != null ? Number(p.compare_at) : null,
     image: p.image_url,
+    video: p.video_url || null,
     description: p.description || ""
   }));
   return { ok: true, products };
 }
 
+/**
+ * The signed-in customer's own orders, newest first. RLS already restricts
+ * this to rows where orders.user_id = auth.uid() (see schema.sql) — this
+ * function doesn't filter client-side, the database does it, so there's
+ * nothing here a tampered request could use to see someone else's orders.
+ */
+async function fetchMyOrders(){
+  const client = getSupabaseClient();
+  if(!client) return { ok: false, error: "Supabase is not configured yet.", orders: [] };
+
+  const { data: userData } = await client.auth.getUser();
+  if(!userData?.user) return { ok: false, error: "Not signed in.", orders: [] };
+
+  const { data, error } = await client
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if(error) return { ok: false, error: error.message, orders: [] };
+  return { ok: true, orders: data || [] };
+}
+
 window.DivaSupabase = {
   createOrder, markOrderPaymentStatus, submitContactMessage,
   signUpWithPassword, signInWithPassword, signInWithGoogle, signOut, getCurrentUser,
-  sendPasswordReset, updatePassword, fetchProducts
+  sendPasswordReset, updatePassword, fetchProducts, fetchMyOrders
 };

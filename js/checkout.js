@@ -177,8 +177,34 @@ function renderReview(form){
   lines.forEach(line => {
     const p = document.createElement("p");
     p.textContent = line;
-    p.style.margin = "0 0 4px";
+    p.classList.add("u-note-line");
     el.appendChild(p);
+  });
+}
+
+/* ---------- Dummy payment modal ---------- */
+/** Shows the "Processing payment…" modal for a beat, then flips to a
+ *  success state, then resolves. Purely visual — the actual order
+ *  status update happens in initPayment() after this resolves. */
+function runDummyPaymentModal(){
+  const modal = document.querySelector("[data-payment-modal]");
+  const processing = document.querySelector("[data-payment-processing]");
+  const success = document.querySelector("[data-payment-success]");
+  if(!modal) return Promise.resolve();
+
+  processing?.classList.remove("hidden");
+  success?.classList.add("hidden");
+  modal.classList.add("open");
+
+  return new Promise(resolve => {
+    setTimeout(() => {
+      processing?.classList.add("hidden");
+      success?.classList.remove("hidden");
+      setTimeout(() => {
+        modal.classList.remove("open");
+        resolve();
+      }, 1000);
+    }, 1600);
   });
 }
 
@@ -234,23 +260,36 @@ function initPayment(){
     // rzp.open();
 
     if(typeof Razorpay === "undefined"){
-      showToast(`Order ${result.orderNumber} saved. Add your Razorpay key to go live.`);
+      // No live Razorpay key yet — run the simulated payment modal so the
+      // demo still feels like a real checkout. This is UI-only: it does
+      // NOT flip orders.payment_status in the database. That's deliberate
+      // — RLS only allows admins to update orders (see schema.sql), so a
+      // customer's browser could never do this even if we tried, and once
+      // real Razorpay is wired up payment_status must only ever be set by
+      // the signature-verified webhook, never the browser. The order sits
+      // as "pending" until an admin (or the future webhook) confirms it.
+      await runDummyPaymentModal();
+
       goToStep("confirmed");
-      renderConfirmation(result.orderNumber, total);
+      renderConfirmation(result.orderNumber, total, { paid: true });
       Cart.clear();
       return;
     }
 
     showToast(`Order ${result.orderNumber} saved — connect your Razorpay key in js/checkout.js to accept payment.`);
     goToStep("confirmed");
-    renderConfirmation(result.orderNumber, total);
+    renderConfirmation(result.orderNumber, total, { paid: false });
     Cart.clear();
   });
 }
 
-function renderConfirmation(orderNumber, total){
+function renderConfirmation(orderNumber, total, { paid } = {}){
   setText("[data-confirm-order-number]", orderNumber);
   setText("[data-confirm-total]", formatINR(total));
+  setText("[data-confirm-payment-note]", paid
+    ? "Payment simulated (demo) — this order is saved and waiting on an admin to confirm it, same as a real order would."
+    : "You'll receive a confirmation once payment is set up and confirmed.");
+  document.querySelector("[data-admin-note]")?.classList.toggle("hidden", !paid);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

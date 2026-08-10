@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Our Story — Diva Jewels</title>
 <meta name="description" content="Diva Jewels is a small studio designing jewelry meant for daily wear — learn about our approach to craft, materials and care.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com data:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com https://*.supabase.co data:; media-src 'self' https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -110,11 +110,11 @@
 
 <section>
   <div class="wrap center">
-    <span class="brand-badge" style="margin:0 auto 20px; width:64px; height:64px; border-radius:16px;">
-      <img src="assets/logo.png" alt="Diva Jewels crest" style="width:46px;height:46px;">
+    <span class="brand-badge u-crest-64">
+      <img src="assets/logo.png" alt="Diva Jewels crest" class="u-icon-46">
     </span>
-    <h2 style="max-width:640px;margin:0 auto 14px;">Thank You for Being Here</h2>
-    <p style="max-width:560px;margin:0 auto;">Whether you're shopping for yourself or someone else, we hope every Diva Jewels piece becomes something you reach for often — not something you save for someday.</p>
+    <h2 class="u-narrow-640">Thank You for Being Here</h2>
+    <p class="u-narrow-560">Whether you're shopping for yourself or someone else, we hope every Diva Jewels piece becomes something you reach for often — not something you save for someday.</p>
   </div>
 </section>
 
@@ -122,7 +122,7 @@
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-about">
-        <a class="brand" href="index.html" style="margin-bottom:14px;">
+        <a class="brand u-mb-14" href="index.html">
           <span class="brand-badge"><img src="assets/logo.png" alt="Diva Jewels crest"></span>
           <span class="brand-word">Diva<small>Jewels</small></span>
         </a>
@@ -156,7 +156,10 @@
     </div>
     <div class="footer-bottom">
       <span>© 2026 Diva Jewels. All rights reserved.</span>
-      <span>Payments secured &amp; encrypted at checkout</span>
+      <div class="footer-bottom-right">
+        <span>Payments secured &amp; encrypted at checkout</span>
+        <a class="footer-admin-link" href="admin/login.html">Store Admin</a>
+      </div>
     </div>
   </div>
 </footer>
@@ -166,5 +169,6 @@
 <script src="js/products-data.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/main.js"></script>
+<script src="js/auth.js"></script>
 </body>
 </html>

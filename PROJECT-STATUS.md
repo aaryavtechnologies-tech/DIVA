@@ -89,37 +89,64 @@ New `/admin` folder, fully separate from the storefront's anon-only flow:
   again — it's idempotent) **to actually sign in and manage products.**
   Until then the storefront quietly keeps using the demo catalogue.
 
-## 🚧 Phase 3 — Customer auth polish (IN PROGRESS)
+## ✅ Phase 3 — Customer auth polish (DONE)
 - ✅ Account/profile icon markup added to the header of **every**
   storefront page (`index.html`, `products.html`, `about.html`,
-  `contact.html`, `cart.html`, `login.html`, `signup.html`) —
-  `[data-account-menu]` / `[data-account-trigger]` / `[data-account-dropdown]`.
+  `contact.html`, `cart.html`, `login.html`, `signup.html`, and the new
+  `orders.html`) — `[data-account-menu]` / `[data-account-trigger]` /
+  `[data-account-dropdown]`.
 - ✅ `js/supabase-client.js` extended with `signInWithGoogle()`,
-  `sendPasswordReset()`, `updatePassword()`; `createOrder()` now attaches
-  `user_id` when a customer is signed in.
-- ⬜ **Not yet done:** the JS that actually populates the account
-  dropdown (`js/auth.js`) — right now the icon renders but is inert. Next
-  step: wire it to `getCurrentUser()` so it shows "Sign In / Create
-  Account" when signed out, and "Signed in as x · My Orders · Sign Out"
-  when signed in, on every page (not just the cart's existing account
-  bar).
-- ⬜ Google OAuth **button** on `login.html` / `signup.html` (the backend
-  function `signInWithGoogle()` exists; no UI button calls it yet).
-- ⬜ Google OAuth **Supabase/Google Cloud Console setup guide** — not yet
-  written into `README.md`.
+  `sendPasswordReset()`, `updatePassword()`, and now `fetchMyOrders()`;
+  `createOrder()` attaches `user_id` when a customer is signed in.
+- ✅ `js/auth.js` now populates the account dropdown on every storefront
+  page (`initAccountMenu()`): signed out shows "Sign In / Create
+  Account", signed in shows "Signed in as `<email>` · My Orders · Sign
+  Out". `js/auth.js` is now included on `index.html`, `products.html`,
+  `about.html`, and `contact.html` too (previously only on
+  `login.html`/`signup.html`/`cart.html`). Cart's old separate
+  `[data-account-bar]` bar was removed — it's the same shared dropdown
+  now, not duplicated.
+- ✅ Google OAuth **button** ("Continue with Google") added to
+  `login.html` and `signup.html`, styled with the existing `.btn-google`
+  class, calling the existing `signInWithGoogle()`.
+- ✅ Google OAuth **Supabase/Google Cloud Console setup guide** written
+  into `README.md` (new "Enable Google Sign-In" section) — Client ID/
+  secret, the Supabase callback redirect URI, and enabling the provider
+  in the Supabase dashboard.
+- ✅ **"My Orders" page** — new `orders.html` + `js/orders.js`. Auth-gated
+  like `cart.html` (redirects to `login.html?redirect=orders.html` if
+  signed out). Lists the signed-in customer's own orders via the new
+  `fetchMyOrders()`, which relies entirely on the existing RLS select
+  policy (`orders.user_id = auth.uid()`) — no schema change needed.
+  Includes status filter pills (All / Ongoing / On Route / Delivered /
+  Cancelled, matching the admin panel's grouping) and a "Reorder"
+  button per order that adds its items back to the cart.
 - ✅ Checkout auth-gate already existed pre-build (`cart.html` redirects
   to `login.html?redirect=cart.html` if not signed in) and still applies —
   satisfies "check login before payment."
 
-## ⬜ Phase 4 — Payments (NOT STARTED THIS SESSION)
-- Dummy/simulated Razorpay flow on the client (a fake "Processing
-  payment…" modal before confirmation) — not yet built. Currently
-  `checkout.js` just skips straight to the confirmation screen when the
-  real Razorpay SDK isn't present, which still works but isn't a visual
-  "payment" moment.
+## ✅ Phase 4a — Dummy/simulated Razorpay flow (DONE)
+- `cart.html` now has a demo payment modal (`[data-payment-modal]`) —
+  "Processing payment…" with a spinner, then a checkmark "Payment
+  Successful" state, before advancing to the confirmation step.
+- `js/checkout.js`'s `runDummyPaymentModal()` drives it; only runs when
+  `typeof Razorpay === "undefined"` (i.e. no live Razorpay key yet).
+- **Deliberately does NOT flip `orders.payment_status` in the database.**
+  RLS only allows admins to update orders (see `schema.sql`), so a
+  customer's browser couldn't do this even if it tried — and once real
+  Razorpay is wired up, `payment_status` must only ever be set by the
+  signature-verified webhook, never client-side. The order sits as
+  `pending` until an admin confirms it (or the future webhook does).
+  The confirmation screen's copy is honest about this ("saved and
+  waiting on an admin to confirm it").
+- The confirmation screen now also shows a "Store admin? Sign in to
+  manage this order →" link to `admin/login.html`, revealed only after
+  a (simulated) successful payment.
 - Real Razorpay wiring (Edge Functions for order creation + webhook) is
-  still intentionally deferred, per your instructions — key secret must
-  never live in frontend code.
+  still intentionally deferred — key secret must never live in frontend
+  code.
+
+## ⬜ Phase 4b — Real Razorpay wiring (NOT STARTED)
 
 ## ⬜ Phase 5 — Docs (NOT STARTED THIS SESSION)
 - `README.md` / `AI-CONTEXT.md` need updating with: how to run
@@ -128,7 +155,7 @@ New `/admin` folder, fully separate from the storefront's anon-only flow:
 
 ---
 
-### Next session should start at Phase 3 (finish `js/auth.js` +
-Google button UI), then Phase 4 (dummy payment modal), then Phase 5
-(docs), in that order. See **`PHASE-3-TODO.md`** for the detailed,
-step-by-step checklist of everything left across Phases 3–5.
+### Next session should start at Phase 4 (dummy payment modal, then
+real Razorpay wiring), then Phase 5 (docs), in that order. See
+**`PHASE-3-TODO.md`** for the detailed, step-by-step checklist of
+everything left across Phases 4–5 (its Phase 3 section is now done).

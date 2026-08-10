@@ -64,7 +64,41 @@ database until you connect Supabase (step 2).
 That's it — orders placed through `cart.html` and messages sent through
 `contact.html` will now land in your Supabase tables.
 
-## 3. Attach Razorpay (when you're ready)
+## 3. Enable Google Sign-In (optional)
+
+The "Continue with Google" button on `login.html` / `signup.html` calls
+`signInWithGoogle()`, which is already wired up in
+`js/supabase-client.js` — the only thing left is a one-time setup click-
+through in the Google Cloud Console and your Supabase Auth dashboard.
+Nothing to build here.
+
+1. **Google Cloud Console**
+   - Create (or reuse) a project at [console.cloud.google.com](https://console.cloud.google.com).
+   - Go to **APIs & Services → OAuth consent screen** and configure it
+     (External user type is fine for a public storefront).
+   - Go to **APIs & Services → Credentials → Create Credentials → OAuth
+     client ID**, application type **Web application**.
+   - Under **Authorized redirect URIs**, add your Supabase project's
+     callback URL:
+     ```
+     https://xpcaxdqhwpvqxtevmors.supabase.co/auth/v1/callback
+     ```
+   - Save, then copy the generated **Client ID** and **Client Secret**.
+2. **Supabase Auth dashboard**
+   - In your Supabase project, go to **Authentication → Providers →
+     Google**.
+   - Toggle it **on**, paste in the **Client ID** and **Client Secret**
+     from the step above, and save.
+   - Under **Authentication → URL Configuration**, make sure your site's
+     URL (and any preview/staging URLs) are listed under **Redirect
+     URLs** — Supabase needs this to hand the session back to
+     `login.html`/`signup.html`/wherever the user started (the app
+     passes this along via `?redirect=`).
+3. That's it — no code changes needed. The button will redirect to
+   Google, then back to Supabase, then back to this site with the user
+   signed in.
+
+## 4. Attach Razorpay (when you're ready)
 
 Razorpay order creation requires your **Key Secret**, which must never be
 placed in frontend code. The recommended flow:
@@ -89,7 +123,7 @@ placed in frontend code. The recommended flow:
 Never trust a payment "success" callback fired only in the browser — always
 confirm it server-side via the webhook before treating an order as paid.
 
-## 4. Build the admin panel
+## 5. Build the admin panel
 
 The schema is ready for it: point a separate authenticated app (Supabase
 Auth + the `service_role` key, used server-side only) at the `orders` table

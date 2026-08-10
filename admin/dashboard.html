@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Diva Jewels Admin</title>
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com; connect-src 'self' https://*.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://*.supabase.co data:; media-src 'self' https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com; connect-src 'self' https://*.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none';">
 <link rel="icon" type="image/png" href="../assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,7 @@
 </head>
 <body class="admin-body">
 
-<div id="auth-checking" style="min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:.9rem;">
+<div id="auth-checking" class="u-center-fill">
   Checking admin access…
 </div>
 
@@ -205,9 +205,23 @@
           <img data-image-preview class="hidden" alt="Preview">
           <label class="btn btn-outline btn-sm admin-upload-btn">
             Upload image
-            <input type="file" accept="image/*" data-image-file style="display:none;">
+            <input type="file" accept="image/*" data-image-file class="u-hidden">
           </label>
           <span class="admin-upload-status" data-upload-status></span>
+        </div>
+      </div>
+
+      <div class="admin-form-row">
+        <label>Video <span class="admin-field-hint">optional — shows a play button on the product</span>
+          <input type="text" data-field="videoUrl" placeholder="https://… (paste a link, or upload a file below)">
+        </label>
+        <div class="admin-image-upload">
+          <video data-video-preview class="hidden" controls muted></video>
+          <label class="btn btn-outline btn-sm admin-upload-btn">
+            Upload video
+            <input type="file" accept="video/*" data-video-file class="u-hidden">
+          </label>
+          <span class="admin-upload-status" data-video-upload-status></span>
         </div>
       </div>
 

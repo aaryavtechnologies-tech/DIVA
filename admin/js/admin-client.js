@@ -178,11 +178,34 @@ async function adminUploadProductImage(file){
   return { ok: true, url: data.publicUrl };
 }
 
+/** Uploads a product video to the SAME `product-images` Storage bucket
+ *  (the bucket isn't type-restricted, and its RLS already limits writes
+ *  to admins / reads to everyone — see schema.sql) and returns its
+ *  public URL, to save into products.video_url. Kept as a separate
+ *  function from the image uploader only because of the different
+ *  type/size limits a video needs. */
+async function adminUploadProductVideo(file){
+  const client = getAdminClient();
+  if(!client) return { ok: false, error: "Supabase is not configured yet." };
+  if(!file) return { ok: false, error: "No file selected." };
+  if(!file.type.startsWith("video/")) return { ok: false, error: "Please choose a video file." };
+  if(file.size > 50 * 1024 * 1024) return { ok: false, error: "Video must be under 50MB." };
+
+  const ext = (file.name.split(".").pop() || "mp4").toLowerCase().replace(/[^a-z0-9]/g, "") || "mp4";
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+  const { error: uploadError } = await client.storage.from("product-images").upload(path, file, { upsert: false });
+  if(uploadError) return { ok: false, error: uploadError.message };
+
+  const { data } = client.storage.from("product-images").getPublicUrl(path);
+  return { ok: true, url: data.publicUrl };
+}
+
 window.DivaAdmin = {
   adminSignIn, adminCheckSession, adminSignOut,
   adminSendPasswordReset, adminUpdatePassword,
   adminFetchOrders, adminUpdateOrderStatus, adminUpdatePaymentStatus,
   adminFetchInquiries,
   adminFetchProducts, adminCreateProduct, adminUpdateProduct, adminDeleteProduct,
-  adminUploadProductImage
+  adminUploadProductImage, adminUploadProductVideo
 };

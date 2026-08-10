@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Bag — Diva Jewels</title>
 <meta name="description" content="Review your bag and check out securely.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com data:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com https://*.supabase.co data:; media-src 'self' https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,8 +57,6 @@
     <div class="auth-checking" data-auth-checking>Checking your session…</div>
 
     <div class="hidden" data-cart-authgate>
-    <div class="account-bar" data-account-bar></div>
-
     <div class="checkout-steps">
       <div class="step active" data-step-label="cart"><span class="dot">1</span> Bag</div>
       <div class="step" data-step-label="address"><span class="dot">2</span> Delivery Address</div>
@@ -79,11 +77,11 @@
           <div data-cart-list></div>
         </div>
         <div class="summary-card">
-          <h3 style="margin-bottom:18px;">Order Summary</h3>
+          <h3 class="u-mb-18">Order Summary</h3>
           <div class="summary-row"><span>Subtotal</span><span data-subtotal>₹0</span></div>
           <div class="summary-row"><span>Shipping</span><span data-shipping>Free</span></div>
           <div class="summary-row total"><span>Total</span><span data-total>₹0</span></div>
-          <button class="btn btn-primary btn-block" data-to-address style="margin-top:14px;">Proceed to Checkout</button>
+          <button class="btn btn-primary btn-block u-mt-14" data-to-address>Proceed to Checkout</button>
         </div>
       </div>
     </div>
@@ -92,7 +90,7 @@
     <div data-step="address" class="hidden">
       <div class="cart-layout">
         <div>
-          <h3 style="margin-bottom:20px;">Delivery Address</h3>
+          <h3 class="u-mb-20">Delivery Address</h3>
           <form id="address-form" novalidate>
             <div class="form-grid">
               <div class="form-field">
@@ -112,7 +110,7 @@
                 <input type="text" id="a-address1" name="address1" required autocomplete="address-line1">
               </div>
               <div class="form-field full">
-                <label for="a-address2">Address Line 2 <span style="text-transform:none;font-weight:400;">(optional)</span></label>
+                <label for="a-address2">Address Line 2 <span class="u-normal-case">(optional)</span></label>
                 <input type="text" id="a-address2" name="address2" autocomplete="address-line2">
               </div>
               <div class="form-field">
@@ -139,14 +137,14 @@
                 </select>
               </div>
             </div>
-            <div style="display:flex; gap:14px; margin-top:6px;">
+            <div class="u-flex-gap14">
               <button type="button" class="btn btn-outline" data-back-to-cart>Back to Bag</button>
               <button type="submit" class="btn btn-primary">Continue to Payment</button>
             </div>
           </form>
         </div>
         <div class="summary-card">
-          <h3 style="margin-bottom:18px;">Order Summary</h3>
+          <h3 class="u-mb-18">Order Summary</h3>
           <div class="summary-row"><span>Subtotal</span><span data-subtotal>₹0</span></div>
           <div class="summary-row"><span>Shipping</span><span data-shipping>Free</span></div>
           <div class="summary-row total"><span>Total</span><span data-total>₹0</span></div>
@@ -158,19 +156,19 @@
     <div data-step="pay" class="hidden">
       <div class="cart-layout">
         <div>
-          <h3 style="margin-bottom:16px;">Deliver To</h3>
-          <div class="summary-card" style="margin-bottom:22px;">
+          <h3 class="u-mb-16">Deliver To</h3>
+          <div class="summary-card u-mb-22">
             <div data-address-review></div>
-            <button type="button" class="remove-link" data-back-to-address style="margin-top:10px;">Edit address</button>
+            <button type="button" class="remove-link u-mt-10" data-back-to-address>Edit address</button>
           </div>
           <p class="form-note">Clicking "Pay" saves your order securely to our system first, so it's never lost — even before payment is confirmed. You'll then be handed off to Razorpay to complete payment.</p>
         </div>
         <div class="summary-card">
-          <h3 style="margin-bottom:18px;">Order Summary</h3>
+          <h3 class="u-mb-18">Order Summary</h3>
           <div class="summary-row"><span>Subtotal</span><span data-subtotal>₹0</span></div>
           <div class="summary-row"><span>Shipping</span><span data-shipping>Free</span></div>
           <div class="summary-row total"><span>Total</span><span data-total>₹0</span></div>
-          <button class="btn btn-gold btn-block" data-pay-btn style="margin-top:14px;">Pay <span data-pay-amount>₹0</span></button>
+          <button class="btn btn-gold btn-block u-mt-14" data-pay-btn>Pay <span data-pay-amount>₹0</span></button>
         </div>
       </div>
     </div>
@@ -180,8 +178,12 @@
       <div class="cart-empty">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 12l5 5L20 6"/></svg>
         <h3>Order Received</h3>
-        <p>Order <strong data-confirm-order-number></strong> for <strong data-confirm-total></strong> has been saved. You'll receive a confirmation once payment is set up and confirmed.</p>
+        <p>Order <strong data-confirm-order-number></strong> for <strong data-confirm-total></strong> has been saved.</p>
+        <p data-confirm-payment-note></p>
         <a href="products.html" class="btn btn-primary">Continue Shopping</a>
+        <p class="hidden admin-note" data-admin-note>
+          Store admin? <a href="admin/login.html">Sign in to manage this order →</a>
+        </p>
       </div>
     </div>
 
@@ -190,11 +192,32 @@
   </div>
 </section>
 
+<!-- Dummy payment modal — simulates a Razorpay payment so the checkout
+     flow feels real even before live Razorpay keys are wired up. -->
+<div class="modal-overlay" data-payment-modal>
+  <div class="modal-box">
+    <span class="demo-tag">Demo Payment</span>
+    <div data-payment-processing>
+      <div class="modal-spinner"></div>
+      <h3>Processing payment…</h3>
+      <p>Simulating your Razorpay payment — no real charge is made.</p>
+    </div>
+    <div class="hidden" data-payment-success>
+      <svg class="modal-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12l5 5L20 6"/></svg>
+      <h3>Payment Successful</h3>
+      <p>Redirecting you to your confirmation…</p>
+    </div>
+  </div>
+</div>
+
 <footer class="site-footer">
   <div class="wrap">
-    <div class="footer-bottom" style="border-top:none; padding-top:0;">
+    <div class="footer-bottom u-footer-flush">
       <span>© 2026 Diva Jewels. All rights reserved.</span>
-      <span>Payments secured &amp; encrypted at checkout</span>
+      <div class="footer-bottom-right">
+        <span>Payments secured &amp; encrypted at checkout</span>
+        <a class="footer-admin-link" href="admin/login.html">Store Admin</a>
+      </div>
     </div>
   </div>
 </footer>

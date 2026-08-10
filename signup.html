@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Create Account — Diva Jewels</title>
 <meta name="description" content="Create your Diva Jewels account.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com data:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com https://*.supabase.co data:; media-src 'self' https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,6 +75,11 @@
         </div>
         <button type="submit" class="btn btn-primary btn-block">Create Account</button>
       </form>
+      <div class="auth-divider">or</div>
+      <button type="button" class="btn-google" data-google-btn>
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.82-.07-1.6-.2-2.36H12v4.47h6.47c-.28 1.5-1.13 2.78-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.74z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.9l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.11C3.24 21.3 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.29a7.24 7.24 0 0 1 0-4.58V6.6H1.26a12 12 0 0 0 0 10.8l4.01-3.11z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.95 1.19 15.24 0 12 0 7.28 0 3.24 2.7 1.26 6.6l4.01 3.11C6.22 6.86 8.87 4.75 12 4.75z"/></svg>
+        Continue with Google
+      </button>
       <p class="auth-switch">Already have an account? <a href="login.html" data-login-link>Sign in</a></p>
     </div>
   </div>
@@ -82,9 +87,12 @@
 
 <footer class="site-footer">
   <div class="wrap">
-    <div class="footer-bottom" style="border-top:none; padding-top:0;">
+    <div class="footer-bottom u-footer-flush">
       <span>© 2026 Diva Jewels. All rights reserved.</span>
-      <span>Payments secured &amp; encrypted at checkout</span>
+      <div class="footer-bottom-right">
+        <span>Payments secured &amp; encrypted at checkout</span>
+        <a class="footer-admin-link" href="admin/login.html">Store Admin</a>
+      </div>
     </div>
   </div>
 </footer>

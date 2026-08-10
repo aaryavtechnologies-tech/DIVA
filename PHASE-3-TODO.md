@@ -30,37 +30,31 @@ reason that has nothing to do with the code:
 
 ---
 
-## 1. Phase 3 — Customer auth polish (in progress, finish this next)
+## 1. Phase 3 — Customer auth polish (DONE)
 
-- [ ] **`js/auth.js`**: the account dropdown markup exists on every
-  page (`[data-account-menu]` etc.) but nothing populates it yet. Wire
-  it to `getCurrentUser()`:
-  - Signed out → show "Sign In / Create Account" links.
-  - Signed in → show "Signed in as `<email>` · My Orders · Sign Out".
-  - Do this once, in `js/auth.js`, since the markup is already on every
-    storefront page — don't duplicate cart.html's existing account bar
-    logic, replace it with the same shared code if that's easier.
-- [ ] **Google OAuth button**: `signInWithGoogle()` already exists in
-  `js/supabase-client.js`. Add an actual "Continue with Google" button
-  to `login.html` and `signup.html` that calls it. There's already a
-  `.btn-google` style in `css/style.css` ready to use.
-- [ ] **Google OAuth setup docs**: write the one-time Google Cloud
-  Console + Supabase Auth dashboard steps into `README.md` (client ID/
-  secret, authorized redirect URI, enabling the provider in Supabase).
-  Nothing to build — just document what you'll click through once.
-- [ ] **"My Orders" page** (implied by the account dropdown above): a
-  simple page/section that lists the signed-in customer's own orders.
-  The RLS policy for this already exists (`orders.user_id = auth.uid()`
-  select policy in `schema.sql`) — this is pure frontend, no schema
-  change needed.
+- [x] **`js/auth.js`**: `initAccountMenu()` now populates the account
+  dropdown on every storefront page via `getSession()`/`onAuthStateChange`.
+  Signed out shows "Sign In / Create Account"; signed in shows "Signed
+  in as `<email>` · My Orders · Sign Out". `js/auth.js` is now included
+  on every storefront page, not just login/signup/cart. Cart's old
+  separate account-bar logic was removed in favor of this shared code.
+- [x] **Google OAuth button**: added to `login.html` and `signup.html`,
+  using the existing `.btn-google` style and calling the existing
+  `signInWithGoogle()`.
+- [x] **Google OAuth setup docs**: written into `README.md` under
+  "Enable Google Sign-In".
+- [x] **"My Orders" page**: new `orders.html` + `js/orders.js`, auth-gated
+  like `cart.html`, using the new `fetchMyOrders()` in
+  `js/supabase-client.js` (relies on the existing RLS select policy,
+  no schema change).
 
-## 2. Phase 4 — Payments (not started)
-
-- [ ] **Dummy/simulated Razorpay flow**: `checkout.js` currently skips
-  straight to the confirmation screen when the real Razorpay SDK isn't
-  present. Add a fake "Processing payment…" modal/step in between so
-  the demo *feels* like a payment happened, even before real Razorpay
-  keys exist.
+## 2. Phase 4 — Payments
+- [x] **Dummy/simulated Razorpay flow**: done — see `PROJECT-STATUS.md`
+  Phase 4a. `cart.html` shows a "Processing payment…" → "Payment
+  Successful" modal, driven by `runDummyPaymentModal()` in
+  `js/checkout.js`. It does not touch `orders.payment_status` (RLS
+  blocks that from the browser by design) — the order stays `pending`
+  until an admin confirms it, which is the honest, secure behavior.
 - [ ] **Real Razorpay wiring** (do this once you have live keys):
   - Supabase Edge Function `create-razorpay-order` — takes an order id,
     calls Razorpay's Orders API server-side with `KEY_SECRET` (never in

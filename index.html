@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diva Jewels — Handcrafted Jewelry, Made to Be Kept</title>
 <meta name="description" content="Diva Jewels is a small-batch jewelry studio crafting necklaces, rings, earrings and bracelets in gold, cream and light — pieces designed to be worn every day and kept for years.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com data:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com https://*.supabase.co data:; media-src 'self' https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,7 +163,7 @@
       <div class="newsletter-copy">
         <span class="eyebrow">Stay in the Loop</span>
         <h3>Subscribe to Our Emails</h3>
-        <p style="margin:0">New drops, restocks and the occasional treat for your inbox.</p>
+        <p class="u-m-0">New drops, restocks and the occasional treat for your inbox.</p>
       </div>
       <form class="newsletter-form" id="newsletter-form">
         <label class="honeypot" for="nl-company">Company</label>
@@ -186,7 +186,7 @@
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-about">
-        <a class="brand" href="index.html" style="margin-bottom:14px;">
+        <a class="brand u-mb-14" href="index.html">
           <span class="brand-badge"><img src="assets/logo.png" alt="Diva Jewels crest"></span>
           <span class="brand-word">Diva<small>Jewels</small></span>
         </a>
@@ -220,7 +220,10 @@
     </div>
     <div class="footer-bottom">
       <span>© 2026 Diva Jewels. All rights reserved.</span>
-      <span>Payments secured &amp; encrypted at checkout</span>
+      <div class="footer-bottom-right">
+        <span>Payments secured &amp; encrypted at checkout</span>
+        <a class="footer-admin-link" href="admin/login.html">Store Admin</a>
+      </div>
     </div>
   </div>
 </footer>
@@ -230,5 +233,6 @@
 <script src="js/products-data.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/main.js"></script>
+<script src="js/auth.js"></script>
 </body>
 </html>

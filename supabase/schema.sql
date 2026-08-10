@@ -9,6 +9,29 @@
 create extension if not exists pgcrypto;
 
 -- ------------------------------------------------------------
+-- Base table-level privileges.
+-- RLS policies (further down) only control WHICH ROWS a role can
+-- see/change once it already has permission to touch the table at
+-- all. Postgres checks that base permission first — without these
+-- GRANTs, anon/authenticated get "permission denied for table X"
+-- (error 42501) no matter how permissive the RLS policies are.
+-- Supabase's dashboard table editor grants these automatically when
+-- you create a table through the UI; tables created via raw SQL (like
+-- this file) need it done explicitly. Safe to re-run.
+-- ------------------------------------------------------------
+grant usage on schema public to anon, authenticated;
+
+grant select, insert on public.orders to anon, authenticated;
+grant update on public.orders to authenticated;
+
+grant select, insert on public.contact_messages to anon, authenticated;
+
+grant select on public.admins to authenticated;
+
+grant select on public.products to anon, authenticated;
+grant insert, update, delete on public.products to authenticated;
+
+-- ------------------------------------------------------------
 -- orders
 -- One row per checkout attempt, written the moment the customer
 -- submits their address — BEFORE payment is attempted — so an
@@ -191,6 +214,7 @@ create table if not exists public.products (
   updated_at   timestamptz not null default now()
 );
 
+alter table public.products add column if not exists video_url text;
 create index if not exists products_active_idx   on public.products (active);
 create index if not exists products_category_idx on public.products (category);
 create index if not exists products_sort_idx     on public.products (sort_order);

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop All Jewelry — Diva Jewels</title>
-<meta name="description" content="Browse the full Diva Jewels collection — necklaces, rings, earrings and bracelets, handcrafted in gold.">
+<title>My Orders — Diva Jewels</title>
+<meta name="description" content="View your Diva Jewels order history and status.">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com https://*.supabase.co data:; media-src 'self' https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com; connect-src 'self' https://*.supabase.co; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,18 +14,6 @@
 </head>
 <body>
 
-<div class="announce">
-  <div class="wrap">
-    <button class="announce-nav" data-announce-prev aria-label="Previous announcement">‹</button>
-    <div class="announce-track">
-      <span class="active">Free shipping on orders over ₹1,999</span>
-      <span>Handcrafted in small batches</span>
-      <span>Easy 7-day returns</span>
-    </div>
-    <button class="announce-nav" data-announce-next aria-label="Next announcement">›</button>
-  </div>
-</div>
-
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html">
@@ -34,7 +22,7 @@
     </a>
     <nav class="main-nav">
       <a href="index.html">Home</a>
-      <a href="products.html" class="active">Shop</a>
+      <a href="products.html">Shop</a>
       <a href="about.html">Our Story</a>
       <a href="contact.html">Contact</a>
     </nav>
@@ -58,56 +46,36 @@
 
 <div class="page-header">
   <div class="wrap">
-    <span class="eyebrow">Full Collection</span>
-    <h1>All Products</h1>
-    <p class="breadcrumb"><a href="index.html">Home</a> / All Products</p>
+    <span class="eyebrow">Your Account</span>
+    <h1>My Orders</h1>
   </div>
 </div>
 
 <section>
   <div class="wrap">
-    <div class="filter-row" data-filter-row></div>
-    <div class="product-grid" data-product-grid></div>
+
+    <div class="auth-checking" data-auth-checking>Checking your session…</div>
+
+    <div class="hidden" data-orders-authgate>
+      <div class="filter-row" data-orders-filter-row></div>
+      <div class="orders-empty hidden" data-orders-empty>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+        <h3>No orders yet</h3>
+        <p>Once you place an order, it'll show up here.</p>
+        <a href="products.html" class="btn btn-primary">Start Shopping</a>
+      </div>
+      <div class="orders-empty hidden" data-orders-filter-empty>
+        <p>No orders match this filter.</p>
+      </div>
+      <div class="orders-list" data-orders-list></div>
+    </div>
+
   </div>
 </section>
 
 <footer class="site-footer">
   <div class="wrap">
-    <div class="footer-grid">
-      <div class="footer-about">
-        <a class="brand u-mb-14" href="index.html">
-          <span class="brand-badge"><img src="assets/logo.png" alt="Diva Jewels crest"></span>
-          <span class="brand-word">Diva<small>Jewels</small></span>
-        </a>
-        <p>Handcrafted jewelry in cream, gold and light — designed to be worn often and kept for years.</p>
-      </div>
-      <div>
-        <h4>Shop</h4>
-        <ul>
-          <li><a href="products.html#Necklaces">Necklaces</a></li>
-          <li><a href="products.html#Rings">Rings</a></li>
-          <li><a href="products.html#Earrings">Earrings</a></li>
-          <li><a href="products.html#Bracelets">Bracelets</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Company</h4>
-        <ul>
-          <li><a href="about.html">Our Story</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
-          <li><a href="cart.html">Your Bag</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Customer Care</h4>
-        <ul>
-          <li><a href="contact.html">Shipping &amp; Returns</a></li>
-          <li><a href="contact.html">Track an Order</a></li>
-          <li><a href="contact.html">FAQs</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
+    <div class="footer-bottom u-footer-flush">
       <span>© 2026 Diva Jewels. All rights reserved.</span>
       <div class="footer-bottom-right">
         <span>Payments secured &amp; encrypted at checkout</span>
@@ -123,5 +91,6 @@
 <script src="js/cart.js"></script>
 <script src="js/main.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/orders.js"></script>
 </body>
 </html>

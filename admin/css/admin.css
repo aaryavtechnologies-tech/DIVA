@@ -115,6 +115,10 @@ table.admin-table tr:hover td{ background:#FCFAF5; }
 
 /* ---------- Products panel ---------- */
 .admin-product-thumb{ width:48px; height:48px; border-radius:6px; object-fit:cover; background:var(--cream); display:block; }
+.admin-video-badge{
+  display:inline-block; margin-top:4px; font-size:.66rem; font-weight:700; letter-spacing:.03em;
+  color:var(--gold-deep); background:var(--cream-deep); padding:1px 6px; border-radius:999px;
+}
 .admin-product-actions{ display:flex; gap:8px; justify-content:flex-end; white-space:nowrap; }
 .admin-icon-btn{
   background:none; border:1px solid var(--line); border-radius:6px; padding:6px 12px; font-size:.78rem;
@@ -158,6 +162,7 @@ table.admin-table tr:hover td{ background:#FCFAF5; }
 
 .admin-image-upload{ display:flex; align-items:center; gap:12px; margin-top:10px; flex-wrap:wrap; }
 .admin-image-upload img[data-image-preview]{ width:52px; height:52px; border-radius:6px; object-fit:cover; border:1px solid var(--line); }
+.admin-image-upload video[data-video-preview]{ width:96px; height:52px; border-radius:6px; object-fit:cover; border:1px solid var(--line); background:#000; }
 .admin-upload-btn{ cursor:pointer; }
 .admin-upload-status{ font-size:.78rem; color:var(--ink-soft); }
 

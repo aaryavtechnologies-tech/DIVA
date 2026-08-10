@@ -87,6 +87,16 @@ function buildProductCard(product){
   link.appendChild(img);
   media.appendChild(link);
 
+  if(product.video){
+    const playBtn = document.createElement("button");
+    playBtn.type = "button";
+    playBtn.className = "product-video-btn";
+    playBtn.setAttribute("aria-label", `Play video of ${product.name}`);
+    playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    playBtn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); openProductVideo(product); });
+    media.appendChild(playBtn);
+  }
+
   const quick = document.createElement("div");
   quick.className = "product-quick";
   const addBtn = document.createElement("button");
@@ -119,6 +129,40 @@ function buildProductCard(product){
   return card;
 }
 window.buildProductCard = buildProductCard;
+
+/* ---------- Product video lightbox (built on demand, shared by every page) ---------- */
+function openProductVideo(product){
+  let overlay = document.querySelector("[data-video-lightbox]");
+  if(!overlay){
+    overlay = document.createElement("div");
+    overlay.className = "modal-overlay video-lightbox";
+    overlay.setAttribute("data-video-lightbox", "");
+    overlay.innerHTML = `
+      <div class="modal-box video-lightbox-box">
+        <button type="button" class="video-lightbox-close" aria-label="Close video">&times;</button>
+        <video data-video-lightbox-player controls playsinline></video>
+        <h3 data-video-lightbox-title></h3>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener("click", (e) => { if(e.target === overlay) closeProductVideo(); });
+    overlay.querySelector(".video-lightbox-close").addEventListener("click", closeProductVideo);
+    document.addEventListener("keydown", (e) => { if(e.key === "Escape") closeProductVideo(); });
+  }
+  const player = overlay.querySelector("[data-video-lightbox-player]");
+  player.src = product.video;
+  overlay.querySelector("[data-video-lightbox-title]").textContent = product.name;
+  overlay.classList.add("open");
+  player.play().catch(() => {});
+}
+function closeProductVideo(){
+  const overlay = document.querySelector("[data-video-lightbox]");
+  if(!overlay) return;
+  overlay.classList.remove("open");
+  const player = overlay.querySelector("[data-video-lightbox-player]");
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+}
 
 function handleAddToCart(productId, btnEl){
   Cart.add(productId, 1);
