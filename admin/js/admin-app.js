@@ -590,6 +590,166 @@ function initProductModal(){
   });
 }
 
+/* ---------- Hero Videos panel ---------- */
+let allHeroVideos = [];
+const fallbackVideos = [
+  { id: "mock-1", sort_order: 1, video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4", poster_url: "https://images.unsplash.com/photo-1569397288884-4d43d6738fbd?auto=format&fit=crop&w=500&q=80" },
+  { id: "mock-2", sort_order: 2, video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", poster_url: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=500&q=80" },
+  { id: "mock-3", sort_order: 3, video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", poster_url: "https://images.unsplash.com/photo-1631982690223-8aa4be0a2497?auto=format&fit=crop&w=500&q=80" },
+  { id: "mock-4", sort_order: 4, video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4", poster_url: "https://images.unsplash.com/photo-1650455221359-3aebf920bcc5?auto=format&fit=crop&w=500&q=80" },
+  { id: "mock-5", sort_order: 5, video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4", poster_url: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=500&q=80" },
+  { id: "mock-6", sort_order: 6, video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4", poster_url: "https://images.unsplash.com/photo-1605100804763-247f67b2548e?auto=format&fit=crop&w=500&q=80" },
+  { id: "mock-7", sort_order: 7, video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4", poster_url: "https://images.unsplash.com/photo-1599643478524-fb66f7ca066b?auto=format&fit=crop&w=500&q=80" }
+];
+
+async function loadHeroVideos(){
+  const body = document.querySelector("[data-videos-body]");
+  if(!body) return;
+  const result = await window.DivaAdmin.adminFetchHeroVideos();
+
+  let videos = [];
+  if(result.ok && result.videos && result.videos.length > 0){
+    videos = result.videos;
+  } else {
+    videos = fallbackVideos;
+  }
+
+  allHeroVideos = videos;
+  paintHeroVideos(allHeroVideos);
+}
+
+function paintHeroVideos(list){
+  const body = document.querySelector("[data-videos-body]");
+  body.innerHTML = "";
+  if(list.length === 0){
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 4;
+    td.className = "admin-empty";
+    td.textContent = "No hero videos found.";
+    tr.appendChild(td);
+    body.appendChild(tr);
+    return;
+  }
+
+  list.forEach(v => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <div style="width: 80px; height: 80px; border-radius: 8px; overflow: hidden; background: #000; position: relative;">
+          <video src="${v.video_url}" poster="${v.poster_url}" muted loop playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+        </div>
+      </td>
+      <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+        <a href="${v.video_url}" target="_blank">${v.video_url}</a>
+      </td>
+      <td>${v.sort_order}</td>
+      <td class="admin-td-actions">
+        <button type="button" class="btn btn-outline btn-sm admin-edit-btn" data-id="${v.id}">Edit</button>
+        <button type="button" class="btn btn-outline btn-sm admin-del-btn" data-id="${v.id}">Delete</button>
+      </td>
+    `;
+    tr.querySelector(".admin-edit-btn").addEventListener("click", () => {
+      if(window.openVideoModal) window.openVideoModal(v);
+    });
+    tr.querySelector(".admin-del-btn").addEventListener("click", async () => {
+      if(!confirm("Delete this video?")) return;
+      if(String(v.id).startsWith("mock-")) {
+        alert("This is a demo video. Add a new video to replace the demo ones!");
+        return;
+      }
+      const res = await window.DivaAdmin.adminDeleteHeroVideo(v.id);
+      if(res.ok){
+        showToast("Video deleted");
+        loadHeroVideos();
+      } else {
+        alert("Couldn't delete: " + res.error);
+      }
+    });
+    // Autoplay preview on hover in admin panel just for flair
+    const vidEl = tr.querySelector("video");
+    tr.addEventListener("mouseenter", () => vidEl.play().catch(()=>{}));
+    tr.addEventListener("mouseleave", () => { vidEl.pause(); vidEl.currentTime = 0; });
+    
+    body.appendChild(tr);
+  });
+}
+
+function initVideoModal(){
+  const modal = document.querySelector("[data-video-modal]");
+  if(!modal) return;
+  const form = document.querySelector("[data-video-form]");
+  const statusEl = document.querySelector("[data-video-form-status]");
+
+  const openBtn = document.querySelector("[data-video-add-btn]");
+  const closeBtns = document.querySelectorAll("[data-video-modal-close]");
+
+  function openModal(video = null){
+    form.reset();
+    statusEl.className = "form-status";
+    if(video && video.id){
+      // If it's a mock video, clear the ID so saving it creates a real row
+      form.querySelector('[data-video-field="id"]').value = String(video.id).startsWith("mock-") ? "" : video.id;
+      form.querySelector('[data-video-field="video_url"]').value = video.video_url || "";
+      form.querySelector('[data-video-field="poster_url"]').value = video.poster_url || "";
+      form.querySelector('[data-video-field="sort_order"]').value = video.sort_order || 0;
+    } else {
+      form.querySelector('[data-video-field="id"]').value = "";
+    }
+    modal.classList.remove("hidden");
+  }
+  function closeModal(){
+    modal.classList.add("hidden");
+  }
+
+  window.openVideoModal = openModal;
+
+  if(openBtn) openBtn.addEventListener("click", () => openModal());
+  closeBtns.forEach(b => b.addEventListener("click", closeModal));
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    statusEl.className = "form-status";
+    
+    const id = form.querySelector('[data-video-field="id"]').value;
+    const videoUrl = form.querySelector('[data-video-field="video_url"]').value.trim();
+    const posterUrl = form.querySelector('[data-video-field="poster_url"]').value.trim();
+    const sortOrder = parseInt(form.querySelector('[data-video-field="sort_order"]').value) || 0;
+
+    if(!videoUrl || !posterUrl){
+      statusEl.textContent = "Please provide both URLs.";
+      statusEl.className = "form-status show err";
+      return;
+    }
+
+    const payload = {
+      video_url: videoUrl,
+      poster_url: posterUrl,
+      sort_order: sortOrder
+    };
+
+    const saveBtn = form.querySelector('button[type="submit"]');
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving…";
+
+    const res = id
+      ? await window.DivaAdmin.adminUpdateHeroVideo(id, payload)
+      : await window.DivaAdmin.adminCreateHeroVideo(payload);
+
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save Video";
+
+    if(res.ok){
+      showToast("Video saved");
+      closeModal();
+      loadHeroVideos();
+    }else{
+      statusEl.textContent = "Couldn't save: " + (res.error || "unknown error");
+      statusEl.className = "form-status show err";
+    }
+  });
+}
+
 /* ---------- Sign out ---------- */
 function initSignOut(){
   document.querySelector("#admin-signout-btn").addEventListener("click", async () => {
@@ -608,9 +768,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   initInquiriesSearch();
   initProductsSearch();
   initProductModal();
+  initVideoModal();
   initSignOut();
 
   loadOrders();
   loadInquiries();
   loadProducts();
+  loadHeroVideos();
 });

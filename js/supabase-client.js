@@ -292,8 +292,22 @@ async function fetchMyOrders(){
   return { ok: true, orders: data || [] };
 }
 
+async function fetchHeroVideos(){
+  const client = getSupabaseClient();
+  if(!client) return { ok: false, error: "Supabase is not configured yet.", videos: [] };
+
+  const { data, error } = await client
+    .from("hero_videos")
+    .select("*")
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if(error) return { ok: false, error: error.message, videos: [] };
+  return { ok: true, videos: data || [] };
+}
+
 window.DivaSupabase = {
   createOrder, markOrderPaymentStatus, submitContactMessage,
   signUpWithPassword, signInWithPassword, signInWithGoogle, signOut, getCurrentUser,
-  sendPasswordReset, updatePassword, fetchProducts, fetchMyOrders
+  sendPasswordReset, updatePassword, fetchProducts, fetchMyOrders, fetchHeroVideos
 };

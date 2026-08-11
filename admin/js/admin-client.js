@@ -201,11 +201,44 @@ async function adminUploadProductVideo(file){
   return { ok: true, url: data.publicUrl };
 }
 
+async function adminFetchHeroVideos(){
+  const client = getAdminClient();
+  if(!client) return { ok: false, error: "Supabase is not configured yet.", videos: [] };
+  const { data, error } = await client.from("hero_videos").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: false });
+  if(error) return { ok: false, error: error.message, videos: [] };
+  return { ok: true, videos: data || [] };
+}
+
+async function adminCreateHeroVideo(payload){
+  const client = getAdminClient();
+  if(!client) return { ok: false, error: "Supabase is not configured yet." };
+  const { data, error } = await client.from("hero_videos").insert([payload]).select().maybeSingle();
+  if(error) return { ok: false, error: error.message };
+  return { ok: true, video: data };
+}
+
+async function adminUpdateHeroVideo(id, payload){
+  const client = getAdminClient();
+  if(!client) return { ok: false, error: "Supabase is not configured yet." };
+  const { data, error } = await client.from("hero_videos").update(payload).eq("id", id).select().maybeSingle();
+  if(error) return { ok: false, error: error.message };
+  return { ok: true, video: data };
+}
+
+async function adminDeleteHeroVideo(id){
+  const client = getAdminClient();
+  if(!client) return { ok: false, error: "Supabase is not configured yet." };
+  const { error } = await client.from("hero_videos").delete().eq("id", id);
+  if(error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 window.DivaAdmin = {
   adminSignIn, adminCheckSession, adminSignOut,
   adminSendPasswordReset, adminUpdatePassword,
   adminFetchOrders, adminUpdateOrderStatus, adminUpdatePaymentStatus,
   adminFetchInquiries,
   adminFetchProducts, adminCreateProduct, adminUpdateProduct, adminDeleteProduct,
-  adminUploadProductImage, adminUploadProductVideo
+  adminUploadProductImage, adminUploadProductVideo,
+  adminFetchHeroVideos, adminCreateHeroVideo, adminUpdateHeroVideo, adminDeleteHeroVideo
 };

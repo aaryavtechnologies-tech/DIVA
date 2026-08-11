@@ -42,6 +42,10 @@
         Products
         <span class="admin-nav-badge hidden" data-products-badge>0</span>
       </button>
+      <button type="button" data-panel-btn="hero_videos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        Hero Videos
+      </button>
     </nav>
 
     <div class="admin-sidebar-foot">
@@ -159,6 +163,40 @@
       </div>
     </section>
 
+    <!-- ================= Hero Videos panel ================= -->
+    <section class="admin-panel" data-panel="hero_videos">
+      <div class="admin-topbar">
+        <div>
+          <h1>Hero Videos</h1>
+          <p>Manage the dynamic bento grid of videos displayed on the home page.</p>
+        </div>
+        <div class="admin-actions">
+          <button type="button" class="btn btn-primary" data-video-add-btn>+ Add Video Card</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-head">
+          <h3>Active Video Cards</h3>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width:120px;">Preview</th>
+                <th>Video URL</th>
+                <th>Sort Order</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody data-videos-body>
+              <tr><td colspan="4" class="admin-loading">Loading videos…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -236,6 +274,42 @@
       <div class="admin-modal-actions">
         <button type="button" class="btn btn-outline" data-product-modal-close>Cancel</button>
         <button type="submit" class="btn btn-primary" data-product-save-btn>Save Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= Video Card modal ================= -->
+<div class="admin-modal-backdrop hidden" data-video-modal>
+  <div class="admin-modal">
+    <div class="admin-modal-head">
+      <h3 data-video-modal-title>Add Hero Video</h3>
+      <button type="button" class="admin-modal-close" data-video-modal-close aria-label="Close">&times;</button>
+    </div>
+    <form data-video-form>
+      <input type="hidden" data-video-field="id">
+
+      <div class="admin-form-row">
+        <label>Video URL
+          <input type="text" data-video-field="video_url" required placeholder="https://...">
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>Poster Image URL
+          <input type="text" data-video-field="poster_url" required placeholder="https://...">
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>Sort Order
+          <input type="number" data-video-field="sort_order" required value="0">
+        </label>
+      </div>
+
+      <div class="form-status" data-video-form-status></div>
+
+      <div class="admin-modal-actions">
+        <button type="button" class="btn btn-outline" data-video-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Video</button>
       </div>
     </form>
   </div>

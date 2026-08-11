@@ -20,6 +20,7 @@ const DEMO_PRODUCTS = [
     price: 2499,
     compareAt: null,
     image: "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=800&q=80",
+    video: "https://assets.mixkit.co/videos/preview/mixkit-woman-putting-on-a-diamond-necklace-42285-large.mp4",
     description: "A fine gold-plated chain with a softly hammered finish that catches light with every turn. Layer it or wear it alone."
   },
   {
@@ -29,6 +30,7 @@ const DEMO_PRODUCTS = [
     price: 1899,
     compareAt: 2299,
     image: "https://images.unsplash.com/photo-1633934542430-0905ccb5f050?auto=format&fit=crop&w=800&q=80",
+    video: "https://assets.mixkit.co/videos/preview/mixkit-diamond-ring-in-a-box-42289-large.mp4",
     description: "Three slim bands designed to be worn together or apart — a set that grows with your collection."
   },
   {
@@ -147,6 +149,51 @@ const DEMO_PRODUCTS = [
     compareAt: 1999,
     image: "https://images.unsplash.com/photo-1679156271456-d6068c543ee7?auto=format&fit=crop&w=800&q=80",
     description: "Two stackable bracelets with tiny charms — mix, match, and make them yours."
+  },
+  {
+    id: "dj-016",
+    name: "Diamond Embellished Hoops",
+    category: "Earrings",
+    price: 3299,
+    compareAt: 3599,
+    image: "https://images.unsplash.com/photo-1635759711674-131758c146d9?auto=format&fit=crop&w=800&q=80",
+    description: "Elegant gold hoops with diamond embellishments."
+  },
+  {
+    id: "dj-017",
+    name: "Rose Gold Pendant",
+    category: "Necklaces",
+    price: 1899,
+    compareAt: null,
+    image: "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=800&q=80",
+    description: "A soft rose gold pendant featuring a minimalist design."
+  },
+  {
+    id: "dj-018",
+    name: "Platinum Engagement Ring",
+    category: "Rings",
+    price: 5999,
+    compareAt: null,
+    image: "https://images.unsplash.com/photo-1599643478524-fb66f7ca066b?auto=format&fit=crop&w=800&q=80",
+    description: "A stunning platinum ring that stands the test of time."
+  },
+  {
+    id: "dj-019",
+    name: "Pearl Drop Earrings",
+    category: "Earrings",
+    price: 2499,
+    compareAt: 2799,
+    image: "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?auto=format&fit=crop&w=800&q=80",
+    description: "Classic pearl drop earrings paired with subtle gold accents."
+  },
+  {
+    id: "dj-020",
+    name: "Golden Twirl Bracelet",
+    category: "Bracelets",
+    price: 3199,
+    compareAt: null,
+    image: "https://images.unsplash.com/photo-1573408301145-b98c4af87f5b?auto=format&fit=crop&w=800&q=80",
+    description: "A beautifully twisted golden bracelet designed to stand out on its own."
   }
 ];
 

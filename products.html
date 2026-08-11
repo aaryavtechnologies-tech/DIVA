@@ -28,17 +28,26 @@
 
 <header class="site-header">
   <div class="wrap">
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
     <a class="brand" href="index.html">
       <span class="brand-badge"><img src="assets/logo.png" alt="Diva Jewels crest"></span>
       <span class="brand-word">Diva<small>Jewels</small></span>
     </a>
     <nav class="main-nav">
+  <button type="button" class="nav-close" data-nav-close aria-label="Close menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
       <a href="index.html">Home</a>
       <a href="products.html" class="active">Shop</a>
       <a href="about.html">Our Story</a>
       <a href="contact.html">Contact</a>
     </nav>
     <div class="header-actions">
+      <a class="icon-btn" href="products.html" aria-label="Search products">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      </a>
       <a class="icon-btn" href="cart.html" aria-label="View cart">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
         <span class="cart-count" data-cart-count>0</span>
@@ -49,12 +58,10 @@
         </button>
         <div class="account-dropdown" data-account-dropdown></div>
       </div>
-      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
     </div>
   </div>
 </header>
+<div class="nav-backdrop" data-nav-backdrop></div>
 
 <div class="page-header">
   <div class="wrap">

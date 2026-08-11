@@ -350,3 +350,46 @@ create policy "admins can delete product images"
 -- storefront now reads live products via the anon key (active = true
 -- only) and the admin Products tab has full CRUD. See PHASE-3-TODO.md.
 -- ============================================================
+
+-- ------------------------------------------------------------
+-- hero_videos
+-- ------------------------------------------------------------
+create table if not exists public.hero_videos (
+  id uuid primary key default gen_random_uuid(),
+  video_url text not null,
+  poster_url text not null,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+grant select on public.hero_videos to anon, authenticated;
+grant insert, update, delete on public.hero_videos to authenticated;
+
+alter table public.hero_videos enable row level security;
+
+-- public storefront (anon + signed-in customers) may read hero_videos
+drop policy if exists "public can view hero videos" on public.hero_videos;
+create policy "public can view hero videos"
+  on public.hero_videos for select
+  to anon, authenticated
+  using (true);
+
+-- admins: full CRUD.
+drop policy if exists "admins can insert hero videos" on public.hero_videos;
+create policy "admins can insert hero videos"
+  on public.hero_videos for insert
+  to authenticated
+  with check (public.is_admin());
+
+drop policy if exists "admins can update hero videos" on public.hero_videos;
+create policy "admins can update hero videos"
+  on public.hero_videos for update
+  to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "admins can delete hero videos" on public.hero_videos;
+create policy "admins can delete hero videos"
+  on public.hero_videos for delete
+  to authenticated
+  using (public.is_admin());

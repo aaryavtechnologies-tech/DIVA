@@ -2,16 +2,37 @@
    DIVA JEWELS — Shared site behavior
    ============================================================ */
 
-/* ---------- Mobile nav ---------- */
+/* ---------- Mobile nav (off-canvas drawer + backdrop) ---------- */
 function initNav(){
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector(".main-nav");
+  const backdrop = document.querySelector("[data-nav-backdrop]");
+  const closeBtn = document.querySelector("[data-nav-close]");
   if(!toggle || !nav) return;
+
+  function openNav(){
+    nav.classList.add("open");
+    backdrop?.classList.add("open");
+    document.body.classList.add("nav-open");
+    toggle.setAttribute("aria-expanded", "true");
+  }
+  function closeNav(){
+    nav.classList.remove("open");
+    backdrop?.classList.remove("open");
+    document.body.classList.remove("nav-open");
+    toggle.setAttribute("aria-expanded", "false");
+  }
+
   toggle.addEventListener("click", () => {
-    const isOpen = nav.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", String(isOpen));
+    nav.classList.contains("open") ? closeNav() : openNav();
   });
-  nav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => nav.classList.remove("open")));
+  closeBtn?.addEventListener("click", closeNav);
+  backdrop?.addEventListener("click", closeNav);
+  document.addEventListener("keydown", (e) => { if(e.key === "Escape") closeNav(); });
+  nav.querySelectorAll("a").forEach(a => a.addEventListener("click", (e) => {
+    setTimeout(closeNav, 100);
+  }));
+  window.addEventListener("resize", () => { if(window.innerWidth > 900) closeNav(); });
 }
 
 /* ---------- Announcement bar rotation ---------- */
@@ -70,13 +91,6 @@ function buildProductCard(product){
   const media = document.createElement("div");
   media.className = "product-media";
 
-  if(product.compareAt){
-    const badge = document.createElement("span");
-    badge.className = "badge";
-    badge.textContent = "Sale";
-    media.appendChild(badge);
-  }
-
   const link = document.createElement("a");
   link.href = `products.html#${encodeURIComponent(product.id)}`;
   link.setAttribute("aria-label", product.name);
@@ -97,19 +111,16 @@ function buildProductCard(product){
     media.appendChild(playBtn);
   }
 
-  const quick = document.createElement("div");
-  quick.className = "product-quick";
-  const addBtn = document.createElement("button");
-  addBtn.className = "add-cart-btn btn-sm";
-  addBtn.type = "button";
-  addBtn.textContent = "Add to Cart";
-  addBtn.addEventListener("click", () => handleAddToCart(product.id, addBtn));
-  quick.appendChild(addBtn);
-  media.appendChild(quick);
-
   const catEl = document.createElement("div");
   catEl.className = "product-cat";
   catEl.textContent = product.category;
+
+  if(product.compareAt){
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = "Sale";
+    catEl.prepend(badge, document.createElement("br"));
+  }
 
   const nameEl = document.createElement("h3");
   nameEl.className = "product-name";
@@ -125,7 +136,16 @@ function buildProductCard(product){
   }
   priceEl.appendChild(document.createTextNode(formatINR(product.price)));
 
-  card.append(media, catEl, nameEl, priceEl);
+  const quick = document.createElement("div");
+  quick.className = "product-quick";
+  const addBtn = document.createElement("button");
+  addBtn.className = "add-cart-btn";
+  addBtn.type = "button";
+  addBtn.textContent = "Add to Cart";
+  addBtn.addEventListener("click", () => handleAddToCart(product.id, addBtn));
+  quick.appendChild(addBtn);
+
+  card.append(media, catEl, nameEl, priceEl, quick);
   return card;
 }
 window.buildProductCard = buildProductCard;
@@ -181,8 +201,61 @@ window.handleAddToCart = handleAddToCart;
 function renderFeatured(){
   const grid = document.querySelector("[data-featured-grid]");
   if(!grid) return;
-  const featured = window.PRODUCTS.slice(0, 4);
+  const featured = window.PRODUCTS.slice(0, 10);
   featured.forEach(p => grid.appendChild(buildProductCard(p)));
+}
+
+/* ---------- Home page: dynamic hero videos ---------- */
+async function renderHeroVideos() {
+  const grid = document.querySelector("[data-hero-videos-grid]");
+  if (!grid) return;
+
+  let videos = [];
+  if (typeof window.DivaSupabase !== "undefined" && typeof window.DivaSupabase.fetchHeroVideos === "function") {
+    const res = await window.DivaSupabase.fetchHeroVideos();
+    if (res.ok && res.videos.length > 0) {
+      videos = res.videos;
+    }
+  }
+
+  // Fallback if no Supabase or empty table
+  if (videos.length === 0) {
+    videos = [
+      { video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4", poster_url: "https://images.unsplash.com/photo-1569397288884-4d43d6738fbd?auto=format&fit=crop&w=500&q=80" },
+      { video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", poster_url: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=500&q=80" },
+      { video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", poster_url: "https://images.unsplash.com/photo-1631982690223-8aa4be0a2497?auto=format&fit=crop&w=500&q=80" },
+      { video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4", poster_url: "https://images.unsplash.com/photo-1650455221359-3aebf920bcc5?auto=format&fit=crop&w=500&q=80" },
+      { video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4", poster_url: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=500&q=80" },
+      { video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4", poster_url: "https://images.unsplash.com/photo-1605100804763-247f67b2548e?auto=format&fit=crop&w=500&q=80" },
+      { video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4", poster_url: "https://images.unsplash.com/photo-1599643478524-fb66f7ca066b?auto=format&fit=crop&w=500&q=80" }
+    ];
+  }
+
+  grid.innerHTML = "";
+  videos.forEach(v => {
+    const vid = document.createElement("video");
+    vid.className = "sparkle-video";
+    vid.src = v.video_url;
+    vid.poster = v.poster_url;
+    vid.autoplay = true;
+    vid.loop = true;
+    vid.muted = true;
+    vid.playsInline = true;
+    grid.appendChild(vid);
+  });
+
+  const domVideos = grid.querySelectorAll('.sparkle-video');
+  const playVideos = () => {
+    domVideos.forEach(vid => {
+      if (vid.paused) {
+        vid.play().catch(e => console.log('Autoplay blocked:', e));
+      }
+    });
+  };
+  
+  playVideos();
+  document.body.addEventListener('click', playVideos, { once: true });
+  document.body.addEventListener('touchstart', playVideos, { once: true });
 }
 
 /* ---------- Products page: full grid + filters ---------- */
@@ -305,4 +378,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   if(window.PRODUCTS_READY) await window.PRODUCTS_READY;
   renderFeatured();
   renderProductsPage();
+  renderHeroVideos();
 });
