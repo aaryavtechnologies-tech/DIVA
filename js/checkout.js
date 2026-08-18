@@ -352,7 +352,7 @@ function renderConfirmation(orderNumber, total, { paid } = {}){
   setText("[data-confirm-payment-note]", paid
     ? "Payment simulated (demo) — this order is saved and waiting on an admin to confirm it, same as a real order would."
     : "You'll receive a confirmation once payment is set up and confirmed.");
-  document.querySelector("[data-admin-note]")?.classList.toggle("hidden", !paid);
+
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
