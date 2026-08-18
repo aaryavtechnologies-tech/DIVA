@@ -49,6 +49,36 @@ function initPanelNav() {
   });
 }
 
+/* ---------- Mobile Navigation ---------- */
+function initMobileNav() {
+  const menuBtn = document.querySelector(".admin-mobile-menu-btn");
+  const closeBtn = document.querySelector(".admin-sidebar-close");
+  const sidebar = document.querySelector(".admin-sidebar");
+  const overlay = document.querySelector(".admin-sidebar-overlay");
+
+  if (!menuBtn || !sidebar || !overlay) return;
+
+  function openSidebar() {
+    sidebar.classList.add("open");
+    overlay.classList.add("open");
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("open");
+  }
+
+  menuBtn.addEventListener("click", openSidebar);
+  if (closeBtn) closeBtn.addEventListener("click", closeSidebar);
+  overlay.addEventListener("click", closeSidebar);
+
+  // Close sidebar when a navigation item is clicked
+  const navButtons = document.querySelectorAll(".admin-nav button");
+  navButtons.forEach(btn => {
+    btn.addEventListener("click", closeSidebar);
+  });
+}
+
 /* ---------- Formatting helpers ---------- */
 function formatDate(iso) {
   const d = new Date(iso);
@@ -1003,6 +1033,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!ok) return;
 
   initPanelNav();
+  initMobileNav();
   initOrdersSearch();
   initInquiriesSearch();
   initProductsSearch();

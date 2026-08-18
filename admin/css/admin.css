@@ -890,36 +890,180 @@ table.admin-table tr:hover td {
   margin-top: 22px;
 }
 
+/* Mobile Header & Overlay (Hidden on Desktop) */
+.admin-mobile-header {
+  display: none;
+}
+
+.admin-sidebar-overlay {
+  display: none;
+}
+
+.admin-sidebar-close {
+  display: none;
+}
+
 @media (max-width:860px) {
   .admin-shell {
-    grid-template-columns: 1fr;
+    display: block; /* No longer grid */
   }
 
-  .admin-sidebar {
-    position: static;
-    height: auto;
-    flex-direction: row;
+  .admin-mobile-header {
+    display: flex;
     align-items: center;
-    overflow-x: auto;
-    padding: 14px;
+    justify-content: space-between;
+    background: var(--ink);
+    padding: 14px 18px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+  }
+
+  .admin-mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .admin-mobile-brand img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .admin-mobile-brand .word {
+    color: var(--cream);
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .admin-mobile-brand .word small {
+    display: block;
+    font-size: .65rem;
+    color: var(--gold-deep);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  .admin-mobile-menu-btn {
+    background: none;
+    border: none;
+    color: var(--cream);
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .admin-mobile-menu-btn svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Off-canvas sidebar */
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Hidden by default */
+    width: 260px;
+    height: 100vh;
+    z-index: 50;
+    transition: transform 0.3s ease;
+    padding: 24px 18px;
+    background: var(--ink);
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(280px); /* Bring it into view */
   }
 
   .admin-sidebar-brand {
-    border-bottom: none;
-    padding: 0 14px 0 0;
-    margin: 0;
-    border-right: 1px solid rgba(255, 255, 255, .12);
+    justify-content: space-between; /* Space out logo and close button */
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+    margin-bottom: 18px;
+  }
+
+  .admin-sidebar-brand .word {
+    display: inline-block; /* Show on mobile menu */
+    color: var(--cream);
+  }
+  
+  .admin-sidebar-brand .word small {
+    display: block;
+    color: var(--gold-deep);
+  }
+
+  .admin-sidebar-close {
+    display: block;
+    background: none;
+    border: none;
+    color: var(--cream);
+    font-size: 2rem;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .admin-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 45;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .admin-sidebar-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .admin-nav {
-    flex-direction: row;
+    flex-direction: column;
   }
 
   .admin-sidebar-foot {
-    display: none;
+    display: block; /* Ensure footer is shown in sidebar */
   }
 
   .admin-main {
-    padding: 24px 18px 50px;
+    padding: 20px 14px 40px;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Prevent horizontal scroll from cards */
+  }
+
+  /* Fix for cards and grids */
+  .admin-card {
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .admin-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .admin-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-topbar .admin-actions,
+  .admin-topbar .btn {
+    width: 100%;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  /* Form layouts */
+  .admin-form-row-2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
