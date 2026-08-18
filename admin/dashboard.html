@@ -1,323 +1,375 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — Diva Jewels Admin</title>
-<meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://*.supabase.co data:; media-src 'self' https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://static.cloudflareinsights.com; connect-src 'self' https://*.supabase.co https://cloudflareinsights.com; base-uri 'self'; form-action 'self'; object-src 'none';">
-<link rel="icon" type="image/png" href="../assets/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="css/admin.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Diva Jewels Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; img-src 'self' https://*.supabase.co data: https://res.cloudinary.com; media-src 'self' https://*.supabase.co https://res.cloudinary.com https://storage.googleapis.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://static.cloudflareinsights.com; connect-src 'self' https://*.supabase.co https://cloudflareinsights.com https://api.cloudinary.com; base-uri 'self'; form-action 'self'; object-src 'none';">
+  <link rel="icon" type="image/png" href="../assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
 </head>
+
 <body class="admin-body">
 
-<div id="auth-checking" class="u-center-fill">
-  Checking admin access…
-</div>
-
-<div class="admin-shell hidden" id="dashboard-shell">
-  <aside class="admin-sidebar">
-    <div class="admin-sidebar-brand">
-      <img src="../assets/logo.png" alt="Diva Jewels crest">
-      <span class="word">Diva<small>Admin Panel</small></span>
-    </div>
-
-    <nav class="admin-nav">
-      <button type="button" class="active" data-panel-btn="orders">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
-        Orders
-        <span class="admin-nav-badge hidden" data-orders-badge>0</span>
-      </button>
-      <button type="button" data-panel-btn="inquiries">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Inquiries
-        <span class="admin-nav-badge hidden" data-inquiries-badge>0</span>
-      </button>
-      <button type="button" data-panel-btn="products">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.5 7.5 12 3 3.5 7.5 12 12l8.5-4.5Z"/><path d="M3.5 7.5v9L12 21l8.5-4.5v-9"/><path d="M12 12v9"/></svg>
-        Products
-        <span class="admin-nav-badge hidden" data-products-badge>0</span>
-      </button>
-      <button type="button" data-panel-btn="hero_videos">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-        Hero Videos
-      </button>
-    </nav>
-
-    <div class="admin-sidebar-foot">
-      <div class="who" data-admin-email>—</div>
-      <button type="button" id="admin-signout-btn">Sign Out</button>
-    </div>
-  </aside>
-
-  <main class="admin-main">
-
-    <!-- ================= Orders panel ================= -->
-    <section class="admin-panel active" data-panel="orders">
-      <div class="admin-topbar">
-        <div>
-          <h1>Orders</h1>
-          <p>Every order placed on the storefront — paid or not — lands here the moment checkout is submitted.</p>
-        </div>
-      </div>
-
-      <div class="admin-stats" data-order-stats></div>
-
-      <div class="admin-card">
-        <div class="admin-card-head">
-          <h3>All Orders</h3>
-          <input type="text" class="admin-search" placeholder="Search order #, name, email…" data-orders-search>
-        </div>
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Order #</th>
-                <th>Customer</th>
-                <th>Items</th>
-                <th>Address</th>
-                <th>Total</th>
-                <th>Payment</th>
-                <th>Order Status</th>
-                <th>Placed</th>
-              </tr>
-            </thead>
-            <tbody data-orders-body>
-              <tr><td colspan="8" class="admin-loading">Loading orders…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= Inquiries panel ================= -->
-    <section class="admin-panel" data-panel="inquiries">
-      <div class="admin-topbar">
-        <div>
-          <h1>Inquiries</h1>
-          <p>Messages submitted through the storefront's Contact page.</p>
-        </div>
-      </div>
-
-      <div class="admin-card">
-        <div class="admin-card-head">
-          <h3>All Inquiries</h3>
-          <input type="text" class="admin-search" placeholder="Search name, email, message…" data-inquiries-search>
-        </div>
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Subject</th>
-                <th>Message</th>
-                <th>Received</th>
-              </tr>
-            </thead>
-            <tbody data-inquiries-body>
-              <tr><td colspan="5" class="admin-loading">Loading inquiries…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= Products panel ================= -->
-    <section class="admin-panel" data-panel="products">
-      <div class="admin-topbar">
-        <div>
-          <h1>Products</h1>
-          <p>Full control over the storefront catalogue — add, edit, hide, or delete any item. Changes appear on the site immediately.</p>
-        </div>
-        <button type="button" class="btn btn-primary btn-sm" data-add-product-btn>+ Add Product</button>
-      </div>
-
-      <div class="admin-card">
-        <div class="admin-card-head">
-          <h3>All Products</h3>
-          <input type="text" class="admin-search" placeholder="Search name, category…" data-products-search>
-        </div>
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Status</th>
-                <th>Updated</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody data-products-body>
-              <tr><td colspan="7" class="admin-loading">Loading products…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= Hero Videos panel ================= -->
-    <section class="admin-panel" data-panel="hero_videos">
-      <div class="admin-topbar">
-        <div>
-          <h1>Hero Videos</h1>
-          <p>Manage the dynamic bento grid of videos displayed on the home page.</p>
-        </div>
-        <div class="admin-actions">
-          <button type="button" class="btn btn-primary" data-video-add-btn>+ Add Video Card</button>
-        </div>
-      </div>
-
-      <div class="admin-card">
-        <div class="admin-card-head">
-          <h3>Active Video Cards</h3>
-        </div>
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th style="width:120px;">Preview</th>
-                <th>Video URL</th>
-                <th>Sort Order</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody data-videos-body>
-              <tr><td colspan="4" class="admin-loading">Loading videos…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-  </main>
-</div>
-
-<!-- ================= Product editor modal ================= -->
-<div class="admin-modal-backdrop hidden" data-product-modal>
-  <div class="admin-modal">
-    <div class="admin-modal-head">
-      <h3 data-product-modal-title>Add Product</h3>
-      <button type="button" class="admin-modal-close" data-product-modal-close aria-label="Close">&times;</button>
-    </div>
-    <form data-product-form>
-      <input type="hidden" data-field="id">
-
-      <div class="admin-form-row">
-        <label>Product Name
-          <input type="text" data-field="name" required maxlength="120" placeholder="e.g. Aurelia Gold Necklace">
-        </label>
-      </div>
-
-      <div class="admin-form-row admin-form-row-2">
-        <label>Category
-          <input type="text" data-field="category" required maxlength="60" placeholder="e.g. Necklaces">
-        </label>
-        <label class="admin-checkbox-label">
-          <input type="checkbox" data-field="active" checked>
-          Visible on storefront
-        </label>
-      </div>
-
-      <div class="admin-form-row admin-form-row-2">
-        <label>Price (₹)
-          <input type="number" data-field="price" required min="0" step="1" placeholder="2499">
-        </label>
-        <label>Compare-at price (₹) <span class="admin-field-hint">optional — shows a strikethrough</span>
-          <input type="number" data-field="compareAt" min="0" step="1" placeholder="2999">
-        </label>
-      </div>
-
-      <div class="admin-form-row">
-        <label>Image
-          <input type="text" data-field="imageUrl" placeholder="https://… (paste a link, or upload a file below)">
-        </label>
-        <div class="admin-image-upload">
-          <img data-image-preview class="hidden" alt="Preview">
-          <label class="btn btn-outline btn-sm admin-upload-btn">
-            Upload image
-            <input type="file" accept="image/*" data-image-file class="u-hidden">
-          </label>
-          <span class="admin-upload-status" data-upload-status></span>
-        </div>
-      </div>
-
-      <div class="admin-form-row">
-        <label>Video <span class="admin-field-hint">optional — shows a play button on the product</span>
-          <input type="text" data-field="videoUrl" placeholder="https://… (paste a link, or upload a file below)">
-        </label>
-        <div class="admin-image-upload">
-          <video data-video-preview class="hidden" controls muted></video>
-          <label class="btn btn-outline btn-sm admin-upload-btn">
-            Upload video
-            <input type="file" accept="video/*" data-video-file class="u-hidden">
-          </label>
-          <span class="admin-upload-status" data-video-upload-status></span>
-        </div>
-      </div>
-
-      <div class="admin-form-row">
-        <label>Description
-          <textarea data-field="description" rows="3" maxlength="600" placeholder="A short, evocative product description…"></textarea>
-        </label>
-      </div>
-
-      <div class="form-status" data-product-form-status></div>
-
-      <div class="admin-modal-actions">
-        <button type="button" class="btn btn-outline" data-product-modal-close>Cancel</button>
-        <button type="submit" class="btn btn-primary" data-product-save-btn>Save Product</button>
-      </div>
-    </form>
+  <div id="auth-checking" class="u-center-fill">
+    Checking admin access…
   </div>
-</div>
 
-<!-- ================= Video Card modal ================= -->
-<div class="admin-modal-backdrop hidden" data-video-modal>
-  <div class="admin-modal">
-    <div class="admin-modal-head">
-      <h3 data-video-modal-title>Add Hero Video</h3>
-      <button type="button" class="admin-modal-close" data-video-modal-close aria-label="Close">&times;</button>
-    </div>
-    <form data-video-form>
-      <input type="hidden" data-video-field="id">
-
-      <div class="admin-form-row">
-        <label>Video URL
-          <input type="text" data-video-field="video_url" required placeholder="https://...">
-        </label>
-      </div>
-      <div class="admin-form-row">
-        <label>Poster Image URL
-          <input type="text" data-video-field="poster_url" required placeholder="https://...">
-        </label>
-      </div>
-      <div class="admin-form-row">
-        <label>Sort Order
-          <input type="number" data-video-field="sort_order" required value="0">
-        </label>
+  <div class="admin-shell hidden" id="dashboard-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-brand">
+        <img src="../assets/logo.png" alt="Diva Jewels crest">
+        <span class="word">Diva<small>Admin Panel</small></span>
       </div>
 
-      <div class="form-status" data-video-form-status></div>
+      <nav class="admin-nav">
+        <button type="button" class="active" data-panel-btn="orders">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6" />
+            <circle cx="9" cy="20" r="1" />
+            <circle cx="18" cy="20" r="1" />
+          </svg>
+          Orders
+          <span class="admin-nav-badge hidden" data-orders-badge>0</span>
+        </button>
+        <button type="button" data-panel-btn="inquiries">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          Inquiries
+          <span class="admin-nav-badge hidden" data-inquiries-badge>0</span>
+        </button>
+        <button type="button" data-panel-btn="products">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20.5 7.5 12 3 3.5 7.5 12 12l8.5-4.5Z" />
+            <path d="M3.5 7.5v9L12 21l8.5-4.5v-9" />
+            <path d="M12 12v9" />
+          </svg>
+          Products
+          <span class="admin-nav-badge hidden" data-products-badge>0</span>
+        </button>
+        <button type="button" data-panel-btn="hero_videos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="23 7 16 12 23 17 23 7" />
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+          </svg>
+          Hero Videos
+        </button>
+      </nav>
 
-      <div class="admin-modal-actions">
-        <button type="button" class="btn btn-outline" data-video-modal-close>Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Video</button>
+      <div class="admin-sidebar-foot">
+        <div class="who" data-admin-email>—</div>
+        <button type="button" id="admin-signout-btn">Sign Out</button>
       </div>
-    </form>
+    </aside>
+
+    <main class="admin-main">
+
+      <!-- ================= Orders panel ================= -->
+      <section class="admin-panel active" data-panel="orders">
+        <div class="admin-topbar">
+          <div>
+            <h1>Orders</h1>
+            <p>Every order placed on the storefront — paid or not — lands here the moment checkout is submitted.</p>
+          </div>
+        </div>
+
+        <div class="admin-stats" data-order-stats></div>
+
+        <div class="admin-card">
+          <div class="admin-card-head">
+            <h3>All Orders</h3>
+            <input type="text" class="admin-search" placeholder="Search order #, name, email…" data-orders-search>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Address</th>
+                  <th>Total</th>
+                  <th>Payment</th>
+                  <th>Order Status</th>
+                  <th>Placed</th>
+                </tr>
+              </thead>
+              <tbody data-orders-body>
+                <tr>
+                  <td colspan="8" class="admin-loading">Loading orders…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Inquiries panel ================= -->
+      <section class="admin-panel" data-panel="inquiries">
+        <div class="admin-topbar">
+          <div>
+            <h1>Inquiries</h1>
+            <p>Messages submitted through the storefront's Contact page.</p>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-head">
+            <h3>All Inquiries</h3>
+            <input type="text" class="admin-search" placeholder="Search name, email, message…" data-inquiries-search>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Subject</th>
+                  <th>Message</th>
+                  <th>Received</th>
+                </tr>
+              </thead>
+              <tbody data-inquiries-body>
+                <tr>
+                  <td colspan="5" class="admin-loading">Loading inquiries…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Products panel ================= -->
+      <section class="admin-panel" data-panel="products">
+        <div class="admin-topbar">
+          <div>
+            <h1>Products</h1>
+            <p>Full control over the storefront catalogue — add, edit, hide, or delete any item. Changes appear on the
+              site immediately.</p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" data-add-product-btn>+ Add Product</button>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-head">
+            <h3>All Products</h3>
+            <input type="text" class="admin-search" placeholder="Search name, category…" data-products-search>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Updated</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody data-products-body>
+                <tr>
+                  <td colspan="7" class="admin-loading">Loading products…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Hero Videos panel ================= -->
+      <section class="admin-panel" data-panel="hero_videos">
+        <div class="admin-topbar">
+          <div>
+            <h1>Hero Videos</h1>
+            <p>Manage the dynamic bento grid of videos displayed on the home page.</p>
+          </div>
+          <div class="admin-actions">
+            <button type="button" class="btn btn-primary" data-video-add-btn>+ Add Video Card</button>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-head" style="border-bottom:none;">
+            <h3 style="color:#2a2b4b; font-size:1.4rem;">Video Management</h3>
+            <p style="color:var(--ink-soft); font-size:.85rem; margin-top:4px;">Manage website videos, previews and display order.</p>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table admin-video-table" style="border-top:1px solid #f2ece4;">
+              <thead>
+                <tr>
+                  <th style="width:160px; background:#fff; padding-left:24px;">PREVIEW</th>
+                  <th style="background:#fff;">TITLE</th>
+                  <th style="background:#fff;">CATEGORY</th>
+                  <th style="background:#fff;">DURATION</th>
+                  <th style="background:#fff;">STATUS</th>
+                  <th style="background:#fff; text-align:right; padding-right:24px;">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody data-videos-body>
+                <tr>
+                  <td colspan="4" class="admin-loading">Loading videos…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
   </div>
-</div>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script src="../js/supabase-client.js"></script>
-<script src="js/admin-client.js"></script>
-<script src="js/admin-app.js"></script>
+  <!-- ================= Product editor modal ================= -->
+  <div class="admin-modal-backdrop hidden" data-product-modal>
+    <div class="admin-modal">
+      <div class="admin-modal-head">
+        <h3 data-product-modal-title>Add Product</h3>
+        <button type="button" class="admin-modal-close" data-product-modal-close aria-label="Close">&times;</button>
+      </div>
+      <form data-product-form>
+        <input type="hidden" data-field="id">
+
+        <div class="admin-form-row">
+          <label>Product Name
+            <input type="text" data-field="name" required maxlength="120" placeholder="e.g. Aurelia Gold Necklace">
+          </label>
+        </div>
+
+        <div class="admin-form-row admin-form-row-2">
+          <label>Category
+            <input type="text" data-field="category" required maxlength="60" placeholder="e.g. Necklaces">
+          </label>
+          <label class="admin-checkbox-label">
+            <input type="checkbox" data-field="active" checked>
+            Visible on storefront
+          </label>
+        </div>
+
+        <div class="admin-form-row admin-form-row-2">
+          <label>Price (₹)
+            <input type="number" data-field="price" required min="0" step="1" placeholder="2499">
+          </label>
+          <label>Compare-at price (₹) <span class="admin-field-hint">optional — shows a strikethrough</span>
+            <input type="number" data-field="compareAt" min="0" step="1" placeholder="2999">
+          </label>
+        </div>
+
+        <div class="admin-form-row">
+          <label>Image
+            <input type="text" data-field="imageUrl" placeholder="https://… (paste a link, or upload a file below)">
+          </label>
+          <div class="admin-image-upload">
+            <img data-image-preview class="hidden" alt="Preview">
+            <label class="btn btn-outline btn-sm admin-upload-btn">
+              Upload image
+              <input type="file" accept="image/*" data-image-file class="u-hidden">
+            </label>
+            <span class="admin-upload-status" data-upload-status></span>
+          </div>
+        </div>
+
+        <div class="admin-form-row">
+          <label>Video <span class="admin-field-hint">optional — shows a play button on the product</span>
+            <input type="text" data-field="videoUrl" placeholder="https://… (paste a link, or upload a file below)">
+          </label>
+          <div class="admin-image-upload">
+            <video data-video-preview class="hidden" controls muted></video>
+            <label class="btn btn-outline btn-sm admin-upload-btn">
+              Upload video
+              <input type="file" accept="video/*" data-video-file class="u-hidden">
+            </label>
+            <span class="admin-upload-status" data-video-upload-status></span>
+          </div>
+        </div>
+
+        <div class="admin-form-row">
+          <label>Description
+            <textarea data-field="description" rows="3" maxlength="600"
+              placeholder="A short, evocative product description…"></textarea>
+          </label>
+        </div>
+
+        <div class="form-status" data-product-form-status></div>
+
+        <div class="admin-modal-actions">
+          <button type="button" class="btn btn-outline" data-product-modal-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" data-product-save-btn>Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= Video Card modal ================= -->
+  <div class="admin-modal-backdrop hidden" data-video-modal>
+    <div class="admin-modal">
+      <div class="admin-modal-head">
+        <h3 data-video-modal-title>Add Hero Video</h3>
+        <button type="button" class="admin-modal-close" data-video-modal-close aria-label="Close">&times;</button>
+      </div>
+      <form data-video-form>
+        <input type="hidden" data-video-field="id">
+
+        <div class="admin-form-row">
+          <label>Video URL
+            <input type="text" data-video-field="video_url" placeholder="https://... (or upload below)">
+          </label>
+          <div class="admin-image-upload">
+            <div class="modal-vid-preview-box hidden" style="width:130px; height:75px; position:relative; overflow:hidden; border-radius:8px; border:1px solid var(--line); flex-shrink:0;">
+              <video data-hero-video-preview autoplay loop muted playsinline style="position:absolute; top:50%; left:50%; width:100%; height:100%; transform:translate(-50%, -50%); object-fit:cover; background:#000;"></video>
+            </div>
+            <label class="btn btn-outline btn-sm admin-upload-btn">
+              Upload video
+              <input type="file" accept="video/*" data-hero-video-file class="u-hidden">
+            </label>
+            <span class="admin-upload-status" data-hero-video-upload-status></span>
+          </div>
+        </div>
+        <div class="admin-form-row">
+          <label>Poster Image URL <span class="admin-field-hint">optional</span>
+            <input type="text" data-video-field="poster_url" placeholder="https://... (or upload below)">
+          </label>
+          <div class="admin-image-upload">
+            <div class="modal-vid-preview-box hidden" style="width:130px; height:75px; position:relative; overflow:hidden; border-radius:8px; border:1px solid var(--line); flex-shrink:0;">
+              <img data-hero-poster-preview alt="Preview" style="position:absolute; top:50%; left:50%; width:100%; height:100%; transform:translate(-50%, -50%); object-fit:cover;">
+            </div>
+            <label class="btn btn-outline btn-sm admin-upload-btn">
+              Upload poster
+              <input type="file" accept="image/*" data-hero-poster-file class="u-hidden">
+            </label>
+            <span class="admin-upload-status" data-hero-poster-upload-status></span>
+          </div>
+        </div>
+        <div class="admin-form-row">
+          <label>Sort Order
+            <input type="number" data-video-field="sort_order" required value="0">
+          </label>
+        </div>
+
+        <div class="form-status" data-video-form-status></div>
+
+        <div class="admin-modal-actions">
+          <button type="button" class="btn btn-outline" data-video-modal-close>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Video</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="js/admin-client.js"></script>
+  <script src="js/admin-app.js"></script>
 </body>
+
 </html>

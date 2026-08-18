@@ -3,26 +3,26 @@
    ============================================================ */
 
 const ORDER_STATUSES = [
-  { value: "received",         label: "Received" },          // ongoing
-  { value: "processing",       label: "Processing" },        // ongoing
-  { value: "shipped",          label: "Shipped" },           // on route
+  { value: "received", label: "Received" },          // ongoing
+  { value: "processing", label: "Processing" },        // ongoing
+  { value: "shipped", label: "Shipped" },           // on route
   { value: "out_for_delivery", label: "Out for Delivery" },  // on route
-  { value: "delivered",        label: "Delivered" },
-  { value: "cancelled",        label: "Cancelled" },
+  { value: "delivered", label: "Delivered" },
+  { value: "cancelled", label: "Cancelled" },
 ];
 
 let allOrders = [];
 let allInquiries = [];
 
 /* ---------- Auth guard ---------- */
-async function guardAdminAccess(){
+async function guardAdminAccess() {
   const check = await window.DivaAdmin.adminCheckSession();
 
-  if(!check.ok || !check.user){
+  if (!check.ok || !check.user) {
     window.location.href = "login.html";
     return false;
   }
-  if(!check.isAdmin){
+  if (!check.isAdmin) {
     await window.DivaAdmin.adminSignOut();
     window.location.href = "login.html";
     return false;
@@ -35,7 +35,7 @@ async function guardAdminAccess(){
 }
 
 /* ---------- Sidebar nav ---------- */
-function initPanelNav(){
+function initPanelNav() {
   const buttons = document.querySelectorAll("[data-panel-btn]");
   buttons.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -50,23 +50,23 @@ function initPanelNav(){
 }
 
 /* ---------- Formatting helpers ---------- */
-function formatDate(iso){
+function formatDate(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) +
-         " · " + d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+    " · " + d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 }
-function inr(n){ return "₹" + Number(n).toLocaleString("en-IN"); }
-function statusLabel(value){
+function inr(n) { return "₹" + Number(n).toLocaleString("en-IN"); }
+function statusLabel(value) {
   const found = ORDER_STATUSES.find(s => s.value === value);
   return found ? found.label : value;
 }
 
 /* ---------- Orders panel ---------- */
-async function loadOrders(){
+async function loadOrders() {
   const body = document.querySelector("[data-orders-body]");
   const result = await window.DivaAdmin.adminFetchOrders();
 
-  if(!result.ok){
+  if (!result.ok) {
     body.innerHTML = "";
     const tr = document.createElement("tr");
     const td = document.createElement("td");
@@ -84,11 +84,11 @@ async function loadOrders(){
 
   const pendingCount = allOrders.filter(o => o.order_status === "received" || o.order_status === "processing").length;
   const badge = document.querySelector("[data-orders-badge]");
-  if(pendingCount > 0){ badge.textContent = pendingCount; badge.classList.remove("hidden"); }
+  if (pendingCount > 0) { badge.textContent = pendingCount; badge.classList.remove("hidden"); }
   else badge.classList.add("hidden");
 }
 
-function renderOrderStats(){
+function renderOrderStats() {
   const wrap = document.querySelector("[data-order-stats]");
   wrap.innerHTML = "";
   const stats = [
@@ -107,11 +107,11 @@ function renderOrderStats(){
   });
 }
 
-function paintOrders(list){
+function paintOrders(list) {
   const body = document.querySelector("[data-orders-body]");
   body.innerHTML = "";
 
-  if(list.length === 0){
+  if (list.length === 0) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 8;
@@ -170,7 +170,7 @@ function paintOrders(list){
       const opt = document.createElement("option");
       opt.value = s.value;
       opt.textContent = s.label;
-      if(s.value === order.order_status) opt.selected = true;
+      if (s.value === order.order_status) opt.selected = true;
       select.appendChild(opt);
     });
     select.addEventListener("change", async () => {
@@ -178,11 +178,11 @@ function paintOrders(list){
       select.disabled = true;
       const res = await window.DivaAdmin.adminUpdateOrderStatus(order.id, select.value);
       select.disabled = false;
-      if(res.ok){
+      if (res.ok) {
         order.order_status = select.value;
         showToast(`${order.order_number} marked "${statusLabel(select.value)}"`);
         renderOrderStats();
-      }else{
+      } else {
         select.value = prev;
         showToast("Couldn't update status: " + (res.error || "unknown error"));
       }
@@ -198,11 +198,11 @@ function paintOrders(list){
   });
 }
 
-function initOrdersSearch(){
+function initOrdersSearch() {
   const input = document.querySelector("[data-orders-search]");
   input.addEventListener("input", () => {
     const q = input.value.trim().toLowerCase();
-    if(!q){ paintOrders(allOrders); return; }
+    if (!q) { paintOrders(allOrders); return; }
     paintOrders(allOrders.filter(o =>
       o.order_number.toLowerCase().includes(q) ||
       o.customer_name.toLowerCase().includes(q) ||
@@ -212,11 +212,11 @@ function initOrdersSearch(){
 }
 
 /* ---------- Inquiries panel ---------- */
-async function loadInquiries(){
+async function loadInquiries() {
   const body = document.querySelector("[data-inquiries-body]");
   const result = await window.DivaAdmin.adminFetchInquiries();
 
-  if(!result.ok){
+  if (!result.ok) {
     body.innerHTML = "";
     const tr = document.createElement("tr");
     const td = document.createElement("td");
@@ -232,15 +232,15 @@ async function loadInquiries(){
   paintInquiries(allInquiries);
 
   const badge = document.querySelector("[data-inquiries-badge]");
-  if(allInquiries.length > 0){ badge.textContent = allInquiries.length; badge.classList.remove("hidden"); }
+  if (allInquiries.length > 0) { badge.textContent = allInquiries.length; badge.classList.remove("hidden"); }
   else badge.classList.add("hidden");
 }
 
-function paintInquiries(list){
+function paintInquiries(list) {
   const body = document.querySelector("[data-inquiries-body]");
   body.innerHTML = "";
 
-  if(list.length === 0){
+  if (list.length === 0) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 5;
@@ -276,11 +276,11 @@ function paintInquiries(list){
   });
 }
 
-function initInquiriesSearch(){
+function initInquiriesSearch() {
   const input = document.querySelector("[data-inquiries-search]");
   input.addEventListener("input", () => {
     const q = input.value.trim().toLowerCase();
-    if(!q){ paintInquiries(allInquiries); return; }
+    if (!q) { paintInquiries(allInquiries); return; }
     paintInquiries(allInquiries.filter(m =>
       m.name.toLowerCase().includes(q) ||
       m.email.toLowerCase().includes(q) ||
@@ -290,9 +290,9 @@ function initInquiriesSearch(){
 }
 
 /* ---------- Toast (simple local version, no dependency on main.js) ---------- */
-function showToast(message){
+function showToast(message) {
   let toast = document.querySelector(".toast");
-  if(!toast){
+  if (!toast) {
     toast = document.createElement("div");
     toast.className = "toast";
     document.body.appendChild(toast);
@@ -307,11 +307,11 @@ function showToast(message){
 let allProducts = [];
 let pendingUploadedImageUrl = null; // set after a successful file upload in the modal
 
-async function loadProducts(){
+async function loadProducts() {
   const body = document.querySelector("[data-products-body]");
   const result = await window.DivaAdmin.adminFetchProducts();
 
-  if(!result.ok){
+  if (!result.ok) {
     body.innerHTML = "";
     const tr = document.createElement("tr");
     const td = document.createElement("td");
@@ -327,15 +327,15 @@ async function loadProducts(){
   paintProducts(allProducts);
 
   const badge = document.querySelector("[data-products-badge]");
-  if(allProducts.length > 0){ badge.textContent = allProducts.length; badge.classList.remove("hidden"); }
+  if (allProducts.length > 0) { badge.textContent = allProducts.length; badge.classList.remove("hidden"); }
   else badge.classList.add("hidden");
 }
 
-function paintProducts(list){
+function paintProducts(list) {
   const body = document.querySelector("[data-products-body]");
   body.innerHTML = "";
 
-  if(list.length === 0){
+  if (list.length === 0) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 7;
@@ -355,7 +355,7 @@ function paintProducts(list){
     img.src = product.image_url || "../assets/logo.png";
     img.alt = product.name;
     imgTd.appendChild(img);
-    if(product.video_url){
+    if (product.video_url) {
       const vBadge = document.createElement("span");
       vBadge.className = "admin-video-badge";
       vBadge.textContent = "▶ video";
@@ -372,7 +372,7 @@ function paintProducts(list){
 
     const priceTd = document.createElement("td");
     priceTd.textContent = inr(product.price) + (product.compare_at ? " " : "");
-    if(product.compare_at){
+    if (product.compare_at) {
       const was = document.createElement("span");
       was.classList.add("u-strike");
       was.textContent = inr(product.compare_at);
@@ -408,11 +408,11 @@ function paintProducts(list){
   });
 }
 
-function initProductsSearch(){
+function initProductsSearch() {
   const input = document.querySelector("[data-products-search]");
   input.addEventListener("input", () => {
     const q = input.value.trim().toLowerCase();
-    if(!q){ paintProducts(allProducts); return; }
+    if (!q) { paintProducts(allProducts); return; }
     paintProducts(allProducts.filter(p =>
       p.name.toLowerCase().includes(q) ||
       p.category.toLowerCase().includes(q)
@@ -421,9 +421,9 @@ function initProductsSearch(){
 }
 
 /* ---------- Product modal (add / edit) ---------- */
-function getProductForm(){ return document.querySelector("[data-product-form]"); }
+function getProductForm() { return document.querySelector("[data-product-form]"); }
 
-function openProductModal(product){
+function openProductModal(product) {
   const modal = document.querySelector("[data-product-modal]");
   const form = getProductForm();
   form.reset();
@@ -436,7 +436,7 @@ function openProductModal(product){
   const preview = document.querySelector("[data-image-preview]");
   const videoPreview = document.querySelector("[data-video-preview]");
 
-  if(product){
+  if (product) {
     document.querySelector("[data-product-modal-title]").textContent = "Edit Product";
     form.querySelector('[data-field="id"]').value = product.id;
     form.querySelector('[data-field="name"]').value = product.name;
@@ -447,11 +447,11 @@ function openProductModal(product){
     form.querySelector('[data-field="imageUrl"]').value = product.image_url || "";
     form.querySelector('[data-field="videoUrl"]').value = product.video_url || "";
     form.querySelector('[data-field="description"]').value = product.description || "";
-    if(product.image_url){ preview.src = product.image_url; preview.classList.remove("hidden"); }
+    if (product.image_url) { preview.src = product.image_url; preview.classList.remove("hidden"); }
     else preview.classList.add("hidden");
-    if(product.video_url){ videoPreview.src = product.video_url; videoPreview.classList.remove("hidden"); }
+    if (product.video_url) { videoPreview.src = product.video_url; videoPreview.classList.remove("hidden"); }
     else videoPreview.classList.add("hidden");
-  }else{
+  } else {
     document.querySelector("[data-product-modal-title]").textContent = "Add Product";
     form.querySelector('[data-field="id"]').value = "";
     form.querySelector('[data-field="active"]').checked = true;
@@ -462,43 +462,43 @@ function openProductModal(product){
   modal.classList.remove("hidden");
 }
 
-function closeProductModal(){
+function closeProductModal() {
   document.querySelector("[data-product-modal]").classList.add("hidden");
 }
 
-async function deleteProduct(product){
-  if(!confirm(`Delete "${product.name}"? This can't be undone.`)) return;
+async function deleteProduct(product) {
+  if (!confirm(`Delete "${product.name}"? This can't be undone.`)) return;
   const res = await window.DivaAdmin.adminDeleteProduct(product.id);
-  if(res.ok){
+  if (res.ok) {
     showToast(`"${product.name}" deleted`);
     loadProducts();
-  }else{
+  } else {
     showToast("Couldn't delete: " + (res.error || "unknown error"));
   }
 }
 
-function initProductModal(){
+function initProductModal() {
   document.querySelector("[data-add-product-btn]").addEventListener("click", () => openProductModal(null));
   document.querySelectorAll("[data-product-modal-close]").forEach(btn => btn.addEventListener("click", closeProductModal));
   document.querySelector("[data-product-modal]").addEventListener("click", (e) => {
-    if(e.target === e.currentTarget) closeProductModal();
+    if (e.target === e.currentTarget) closeProductModal();
   });
 
   // Image upload → Supabase Storage, fills the URL field + preview.
   document.querySelector("[data-image-file]").addEventListener("change", async (e) => {
     const file = e.target.files[0];
-    if(!file) return;
+    if (!file) return;
     const status = document.querySelector("[data-upload-status]");
     status.textContent = "Uploading…";
     const res = await window.DivaAdmin.adminUploadProductImage(file);
-    if(res.ok){
+    if (res.ok) {
       pendingUploadedImageUrl = res.url;
       getProductForm().querySelector('[data-field="imageUrl"]').value = res.url;
       const preview = document.querySelector("[data-image-preview]");
       preview.src = res.url;
       preview.classList.remove("hidden");
       status.textContent = "Uploaded ✓";
-    }else{
+    } else {
       status.textContent = "Upload failed: " + (res.error || "unknown error");
     }
     e.target.value = "";
@@ -507,24 +507,24 @@ function initProductModal(){
   // Live preview when a URL is pasted by hand.
   getProductForm().querySelector('[data-field="imageUrl"]').addEventListener("input", (e) => {
     const preview = document.querySelector("[data-image-preview]");
-    if(e.target.value.trim()){ preview.src = e.target.value.trim(); preview.classList.remove("hidden"); }
+    if (e.target.value.trim()) { preview.src = e.target.value.trim(); preview.classList.remove("hidden"); }
     else preview.classList.add("hidden");
   });
 
   // Video upload → Supabase Storage, fills the URL field + preview.
   document.querySelector("[data-video-file]").addEventListener("change", async (e) => {
     const file = e.target.files[0];
-    if(!file) return;
+    if (!file) return;
     const status = document.querySelector("[data-video-upload-status]");
     status.textContent = "Uploading…";
     const res = await window.DivaAdmin.adminUploadProductVideo(file);
-    if(res.ok){
+    if (res.ok) {
       getProductForm().querySelector('[data-field="videoUrl"]').value = res.url;
       const preview = document.querySelector("[data-video-preview]");
       preview.src = res.url;
       preview.classList.remove("hidden");
       status.textContent = "Uploaded ✓";
-    }else{
+    } else {
       status.textContent = "Upload failed: " + (res.error || "unknown error");
     }
     e.target.value = "";
@@ -533,7 +533,7 @@ function initProductModal(){
   // Live preview when a video URL is pasted by hand.
   getProductForm().querySelector('[data-field="videoUrl"]').addEventListener("input", (e) => {
     const preview = document.querySelector("[data-video-preview]");
-    if(e.target.value.trim()){ preview.src = e.target.value.trim(); preview.classList.remove("hidden"); }
+    if (e.target.value.trim()) { preview.src = e.target.value.trim(); preview.classList.remove("hidden"); }
     else preview.classList.add("hidden");
   });
 
@@ -554,7 +554,7 @@ function initProductModal(){
     const description = form.querySelector('[data-field="description"]').value.trim();
     const active = form.querySelector('[data-field="active"]').checked;
 
-    if(!name || !category || !Number.isFinite(price) || price < 0){
+    if (!name || !category || !Number.isFinite(price) || price < 0) {
       statusEl.textContent = "Please fill in a name, category, and a valid price.";
       statusEl.className = "form-status show err";
       return;
@@ -579,11 +579,11 @@ function initProductModal(){
     saveBtn.disabled = false;
     saveBtn.textContent = "Save Product";
 
-    if(res.ok){
+    if (res.ok) {
       showToast(id ? `"${name}" updated` : `"${name}" added`);
       closeProductModal();
       loadProducts();
-    }else{
+    } else {
       statusEl.textContent = "Couldn't save: " + (res.error || "unknown error");
       statusEl.className = "form-status show err";
     }
@@ -602,13 +602,13 @@ const fallbackVideos = [
   { id: "mock-7", sort_order: 7, video_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4", poster_url: "https://images.unsplash.com/photo-1599643478524-fb66f7ca066b?auto=format&fit=crop&w=500&q=80" }
 ];
 
-async function loadHeroVideos(){
+async function loadHeroVideos() {
   const body = document.querySelector("[data-videos-body]");
-  if(!body) return;
+  if (!body) return;
   const result = await window.DivaAdmin.adminFetchHeroVideos();
 
   let videos = [];
-  if(result.ok && result.videos && result.videos.length > 0){
+  if (result.ok && result.videos && result.videos.length > 0) {
     videos = result.videos;
   } else {
     videos = fallbackVideos;
@@ -618,10 +618,10 @@ async function loadHeroVideos(){
   paintHeroVideos(allHeroVideos);
 }
 
-function paintHeroVideos(list){
+function paintHeroVideos(list) {
   const body = document.querySelector("[data-videos-body]");
   body.innerHTML = "";
-  if(list.length === 0){
+  if (list.length === 0) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 4;
@@ -633,22 +633,69 @@ function paintHeroVideos(list){
   }
 
   list.forEach(v => {
+    let catClass = "vid-cat-promo";
+    let catName = "Promotion";
+    let title = "Special Occasion Edit";
+    const sort = Number(v.sort_order);
+    if(sort === 1) { catClass = "vid-cat-home"; catName = "Home Banner"; title = "Timeless Collection"; }
+    else if(sort === 2) { catClass = "vid-cat-story"; catName = "Our Story"; title = "Behind The Craft"; }
+    else if(sort === 3) { catClass = "vid-cat-collection"; catName = "Collection"; title = "New Arrivals"; }
+    else if(sort === 4) { catClass = "vid-cat-about"; catName = "About Us"; title = "Crafted To Perfection"; }
+
+    const dateStr = formatDate(v.created_at || new Date().toISOString()).split(' · ')[0];
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>
-        <div style="width: 80px; height: 80px; border-radius: 8px; overflow: hidden; background: #000; position: relative;">
-          <video src="${v.video_url}" poster="${v.poster_url}" muted loop playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+      <td style="padding-left:24px;">
+        <div class="vid-preview-wrap vid-preview-clickable" data-video-src="${v.video_url}" title="Click to preview">
+          <video src="${v.video_url}" poster="${v.poster_url || ''}" muted loop playsinline></video>
+          <div class="vid-play-icon">
+             <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+          <div class="vid-preview-overlay">Preview</div>
         </div>
       </td>
-      <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-        <a href="${v.video_url}" target="_blank">${v.video_url}</a>
+      <td>
+        <div class="vid-title">${title}</div>
+        <div class="vid-meta">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:-1px;"><path d="M12 19V9M8 13l4-4 4 4M20 16.5a4.5 4.5 0 00-3-8h-.3a7 7 0 00-13.4 2A4.5 4.5 0 005.5 19h11z"/></svg>
+          Uploaded on ${dateStr}
+        </div>
       </td>
-      <td>${v.sort_order}</td>
-      <td class="admin-td-actions">
-        <button type="button" class="btn btn-outline btn-sm admin-edit-btn" data-id="${v.id}">Edit</button>
-        <button type="button" class="btn btn-outline btn-sm admin-del-btn" data-id="${v.id}">Delete</button>
+      <td>
+        <span class="vid-category-pill ${catClass}">${catName}</span>
+      </td>
+      <td>
+        <div class="vid-meta" style="font-size:.85rem; color:#4a4a4a;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          00:15
+        </div>
+      </td>
+      <td>
+        <span class="vid-status-pill vid-status-active">Active</span>
+      </td>
+      <td style="padding-right:24px;">
+        <div class="vid-actions-wrap">
+          <button type="button" class="vid-icon-btn admin-edit-btn" data-id="${v.id}" title="Edit">
+             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <div class="vid-toggle-wrap">
+            <label class="vid-toggle">
+              <input type="checkbox" checked>
+              <span class="vid-slider"></span>
+            </label>
+            <span class="vid-toggle-label">Visibility</span>
+          </div>
+          <button type="button" class="vid-icon-btn danger admin-del-btn" data-id="${v.id}" title="Delete">
+             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
       </td>
     `;
+    // Video preview click → lightbox
+    tr.querySelector(".vid-preview-clickable").addEventListener("click", () => {
+      openAdminVideoLightbox(v.video_url, v.poster_url, title);
+    });
     tr.querySelector(".admin-edit-btn").addEventListener("click", () => {
       if(window.openVideoModal) window.openVideoModal(v);
     });
@@ -666,71 +713,263 @@ function paintHeroVideos(list){
         alert("Couldn't delete: " + res.error);
       }
     });
-    // Autoplay preview on hover in admin panel just for flair
+    // Autoplay preview on hover
     const vidEl = tr.querySelector("video");
     tr.addEventListener("mouseenter", () => vidEl.play().catch(()=>{}));
     tr.addEventListener("mouseleave", () => { vidEl.pause(); vidEl.currentTime = 0; });
-    
     body.appendChild(tr);
   });
 }
 
-function initVideoModal(){
+function openAdminVideoLightbox(videoSrc, posterSrc, title) {
+  let lightbox = document.getElementById('admin-video-lightbox');
+  if (!lightbox) {
+    lightbox = document.createElement('div');
+    lightbox.id = 'admin-video-lightbox';
+    lightbox.className = 'admin-lightbox-overlay';
+    lightbox.innerHTML = `
+      <div class="admin-lightbox-content">
+        <button type="button" class="admin-lightbox-close" title="Close">&times;</button>
+        <div class="admin-lightbox-header"></div>
+        <video controls playsinline autoplay></video>
+      </div>
+    `;
+    document.body.appendChild(lightbox);
+
+    lightbox.querySelector('.admin-lightbox-close').addEventListener('click', () => {
+      lightbox.classList.remove('active');
+      lightbox.querySelector('video').pause();
+    });
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        lightbox.classList.remove('active');
+        lightbox.querySelector('video').pause();
+      }
+    });
+  }
+
+  const vidEl = lightbox.querySelector('video');
+  vidEl.src = videoSrc;
+  if (posterSrc) vidEl.poster = posterSrc;
+  lightbox.querySelector('.admin-lightbox-header').textContent = title || 'Video Preview';
+  
+  lightbox.classList.add('active');
+}
+
+function initVideoModal() {
   const modal = document.querySelector("[data-video-modal]");
-  if(!modal) return;
+  if (!modal) return;
   const form = document.querySelector("[data-video-form]");
   const statusEl = document.querySelector("[data-video-form-status]");
 
   const openBtn = document.querySelector("[data-video-add-btn]");
   const closeBtns = document.querySelectorAll("[data-video-modal-close]");
 
-  function openModal(video = null){
+  let pendingVideoFile = null;
+  let pendingPosterFile = null;
+
+  function openModal(video = null) {
+    pendingVideoFile = null;
+    pendingPosterFile = null;
+    const vidStatus = document.querySelector("[data-hero-video-upload-status]");
+    if (vidStatus) vidStatus.textContent = "";
+    const posterStatus = document.querySelector("[data-hero-poster-upload-status]");
+    if (posterStatus) posterStatus.textContent = "";
+
     form.reset();
     statusEl.className = "form-status";
-    if(video && video.id){
+
+    const vidPreview = document.querySelector("[data-hero-video-preview]");
+    const posterPreview = document.querySelector("[data-hero-poster-preview]");
+
+    if (video && video.id) {
       // If it's a mock video, clear the ID so saving it creates a real row
       form.querySelector('[data-video-field="id"]').value = String(video.id).startsWith("mock-") ? "" : video.id;
       form.querySelector('[data-video-field="video_url"]').value = video.video_url || "";
       form.querySelector('[data-video-field="poster_url"]').value = video.poster_url || "";
       form.querySelector('[data-video-field="sort_order"]').value = video.sort_order || 0;
+
+      if (video.video_url && vidPreview) { 
+        vidPreview.src = video.video_url; 
+        vidPreview.classList.remove("hidden");
+        vidPreview.parentElement.classList.remove("hidden"); 
+      } else if (vidPreview) {
+        vidPreview.classList.add("hidden");
+        if(vidPreview.parentElement.classList.contains("modal-vid-preview-box")) vidPreview.parentElement.classList.add("hidden");
+      }
+
+      if (video.poster_url && posterPreview) { 
+        posterPreview.src = video.poster_url; 
+        posterPreview.classList.remove("hidden");
+        posterPreview.parentElement.classList.remove("hidden"); 
+      } else if (posterPreview) {
+        posterPreview.classList.add("hidden");
+        if(posterPreview.parentElement.classList.contains("modal-vid-preview-box")) posterPreview.parentElement.classList.add("hidden");
+      }
     } else {
       form.querySelector('[data-video-field="id"]').value = "";
+      if (vidPreview) {
+        vidPreview.classList.add("hidden");
+        if(vidPreview.parentElement.classList.contains("modal-vid-preview-box")) vidPreview.parentElement.classList.add("hidden");
+      }
+      if (posterPreview) {
+        posterPreview.classList.add("hidden");
+        if(posterPreview.parentElement.classList.contains("modal-vid-preview-box")) posterPreview.parentElement.classList.add("hidden");
+      }
     }
     modal.classList.remove("hidden");
   }
-  function closeModal(){
+  function closeModal() {
     modal.classList.add("hidden");
   }
 
   window.openVideoModal = openModal;
 
-  if(openBtn) openBtn.addEventListener("click", () => openModal());
+  if (openBtn) openBtn.addEventListener("click", () => openModal());
   closeBtns.forEach(b => b.addEventListener("click", closeModal));
+
+  const videoFileInput = document.querySelector("[data-hero-video-file]");
+  if (videoFileInput) {
+    videoFileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      pendingVideoFile = file;
+      const status = document.querySelector("[data-hero-video-upload-status]");
+      status.textContent = "Selected (will upload on save)";
+      
+      const localUrl = URL.createObjectURL(file);
+      const preview = document.querySelector("[data-hero-video-preview]");
+      if (preview) { 
+        preview.src = localUrl; 
+        preview.classList.remove("hidden");
+        preview.parentElement.classList.remove("hidden"); 
+        preview.play().catch(()=>{});
+      }
+      // Don't upload yet!
+    });
+  }
+
+  const posterFileInput = document.querySelector("[data-hero-poster-file]");
+  if (posterFileInput) {
+    posterFileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      pendingPosterFile = file;
+      const status = document.querySelector("[data-hero-poster-upload-status]");
+      status.textContent = "Selected (will upload on save)";
+      
+      const localUrl = URL.createObjectURL(file);
+      const preview = document.querySelector("[data-hero-poster-preview]");
+      if (preview) { 
+        preview.src = localUrl; 
+        preview.classList.remove("hidden");
+        preview.parentElement.classList.remove("hidden"); 
+      }
+      // Don't upload yet!
+    });
+  }
+
+  // Live preview when a URL is pasted by hand
+  const vidUrlInput = form.querySelector('[data-video-field="video_url"]');
+  if (vidUrlInput) {
+    vidUrlInput.addEventListener("input", (e) => {
+      const url = e.target.value.trim();
+      const preview = document.querySelector("[data-hero-video-preview]");
+      const status = document.querySelector("[data-video-form-status]");
+      
+      if (url.includes("instagram.com")) {
+        if (status) {
+          status.textContent = "Instagram links cannot be previewed or autoplayed seamlessly. Please download the reel and upload the raw MP4 file below for the best experience.";
+          status.className = "form-status show err";
+        }
+      } else if (status) {
+        status.className = "form-status";
+      }
+
+      if (preview) {
+        if (url) { 
+          preview.src = url; 
+          preview.classList.remove("hidden");
+          preview.parentElement.classList.remove("hidden");
+          preview.play().catch(()=>{});
+        } else {
+          preview.classList.add("hidden");
+          if(preview.parentElement.classList.contains("modal-vid-preview-box")) preview.parentElement.classList.add("hidden");
+        }
+      }
+    });
+  }
+
+  const posterUrlInput = form.querySelector('[data-video-field="poster_url"]');
+  if (posterUrlInput) {
+    posterUrlInput.addEventListener("input", (e) => {
+      const preview = document.querySelector("[data-hero-poster-preview]");
+      if (preview) {
+        if (e.target.value.trim()) { preview.src = e.target.value.trim(); preview.parentElement.classList.remove("hidden"); }
+        else preview.parentElement.classList.add("hidden");
+      }
+    });
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     statusEl.className = "form-status";
-    
+
     const id = form.querySelector('[data-video-field="id"]').value;
-    const videoUrl = form.querySelector('[data-video-field="video_url"]').value.trim();
-    const posterUrl = form.querySelector('[data-video-field="poster_url"]').value.trim();
+    let videoUrl = form.querySelector('[data-video-field="video_url"]').value.trim();
+    let posterUrl = form.querySelector('[data-video-field="poster_url"]').value.trim();
     const sortOrder = parseInt(form.querySelector('[data-video-field="sort_order"]').value) || 0;
 
-    if(!videoUrl || !posterUrl){
-      statusEl.textContent = "Please provide both URLs.";
+    const saveBtn = form.querySelector('button[type="submit"]');
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Uploading & Saving…";
+
+    if (pendingVideoFile) {
+      statusEl.textContent = "Uploading video to Cloudinary...";
+      statusEl.className = "form-status show";
+      const res = await window.DivaAdmin.adminUploadProductVideo(pendingVideoFile);
+      if (res.ok) {
+        videoUrl = res.url;
+      } else {
+        statusEl.textContent = "Video upload failed: " + (res.error || "unknown error");
+        statusEl.className = "form-status show err";
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save Video";
+        return;
+      }
+    }
+
+    if (pendingPosterFile) {
+      statusEl.textContent = "Uploading poster to Cloudinary...";
+      statusEl.className = "form-status show";
+      const res = await window.DivaAdmin.adminUploadProductImage(pendingPosterFile);
+      if (res.ok) {
+        posterUrl = res.url;
+      } else {
+        statusEl.textContent = "Poster upload failed: " + (res.error || "unknown error");
+        statusEl.className = "form-status show err";
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save Video";
+        return;
+      }
+    }
+
+    if (!videoUrl) {
+      statusEl.textContent = "Please provide a Video URL or upload a file.";
       statusEl.className = "form-status show err";
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save Video";
       return;
     }
 
     const payload = {
       video_url: videoUrl,
-      poster_url: posterUrl,
+      poster_url: posterUrl || "",
       sort_order: sortOrder
     };
 
-    const saveBtn = form.querySelector('button[type="submit"]');
-    saveBtn.disabled = true;
-    saveBtn.textContent = "Saving…";
+    // saveBtn already disabled and styled in the previous step
+
 
     const res = id
       ? await window.DivaAdmin.adminUpdateHeroVideo(id, payload)
@@ -739,11 +978,11 @@ function initVideoModal(){
     saveBtn.disabled = false;
     saveBtn.textContent = "Save Video";
 
-    if(res.ok){
+    if (res.ok) {
       showToast("Video saved");
       closeModal();
       loadHeroVideos();
-    }else{
+    } else {
       statusEl.textContent = "Couldn't save: " + (res.error || "unknown error");
       statusEl.className = "form-status show err";
     }
@@ -751,7 +990,7 @@ function initVideoModal(){
 }
 
 /* ---------- Sign out ---------- */
-function initSignOut(){
+function initSignOut() {
   document.querySelector("#admin-signout-btn").addEventListener("click", async () => {
     await window.DivaAdmin.adminSignOut();
     window.location.href = "login.html";
@@ -761,7 +1000,7 @@ function initSignOut(){
 /* ---------- Init ---------- */
 document.addEventListener("DOMContentLoaded", async () => {
   const ok = await guardAdminAccess();
-  if(!ok) return;
+  if (!ok) return;
 
   initPanelNav();
   initOrdersSearch();

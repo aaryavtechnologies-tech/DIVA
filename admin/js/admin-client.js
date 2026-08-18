@@ -162,20 +162,28 @@ async function adminDeleteProduct(id){
  *  bucket and returns its public URL (to save into products.image_url).
  *  Storage policies (schema.sql) restrict writes to admins only. */
 async function adminUploadProductImage(file){
-  const client = getAdminClient();
-  if(!client) return { ok: false, error: "Supabase is not configured yet." };
   if(!file) return { ok: false, error: "No file selected." };
   if(!file.type.startsWith("image/")) return { ok: false, error: "Please choose an image file." };
-  if(file.size > 5 * 1024 * 1024) return { ok: false, error: "Image must be under 5MB." };
+  if(file.size > 1 * 1024 * 1024) return { ok: false, error: "Image must be under 1MB." };
 
-  const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "diva_img");
 
-  const { error: uploadError } = await client.storage.from("product-images").upload(path, file, { upsert: false });
-  if(uploadError) return { ok: false, error: uploadError.message };
-
-  const { data } = client.storage.from("product-images").getPublicUrl(path);
-  return { ok: true, url: data.publicUrl };
+  try {
+    const res = await fetch("https://api.cloudinary.com/v1_1/mpvxdrnu/image/upload", {
+      method: "POST",
+      body: formData
+    });
+    const data = await res.json();
+    if(res.ok) {
+      return { ok: true, url: data.secure_url };
+    } else {
+      return { ok: false, error: data.error?.message || "Upload failed." };
+    }
+  } catch(err) {
+    return { ok: false, error: err.message };
+  }
 }
 
 /** Uploads a product video to the SAME `product-images` Storage bucket
@@ -185,20 +193,28 @@ async function adminUploadProductImage(file){
  *  function from the image uploader only because of the different
  *  type/size limits a video needs. */
 async function adminUploadProductVideo(file){
-  const client = getAdminClient();
-  if(!client) return { ok: false, error: "Supabase is not configured yet." };
   if(!file) return { ok: false, error: "No file selected." };
   if(!file.type.startsWith("video/")) return { ok: false, error: "Please choose a video file." };
-  if(file.size > 50 * 1024 * 1024) return { ok: false, error: "Video must be under 50MB." };
+  if(file.size > 10 * 1024 * 1024) return { ok: false, error: "Video must be under 10MB." };
 
-  const ext = (file.name.split(".").pop() || "mp4").toLowerCase().replace(/[^a-z0-9]/g, "") || "mp4";
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "diva_vid");
 
-  const { error: uploadError } = await client.storage.from("product-images").upload(path, file, { upsert: false });
-  if(uploadError) return { ok: false, error: uploadError.message };
-
-  const { data } = client.storage.from("product-images").getPublicUrl(path);
-  return { ok: true, url: data.publicUrl };
+  try {
+    const res = await fetch("https://api.cloudinary.com/v1_1/mpvxdrnu/video/upload", {
+      method: "POST",
+      body: formData
+    });
+    const data = await res.json();
+    if(res.ok) {
+      return { ok: true, url: data.secure_url };
+    } else {
+      return { ok: false, error: data.error?.message || "Upload failed." };
+    }
+  } catch(err) {
+    return { ok: false, error: err.message };
+  }
 }
 
 async function adminFetchHeroVideos(){

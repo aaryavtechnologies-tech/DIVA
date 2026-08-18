@@ -237,10 +237,18 @@ async function renderHeroVideos() {
     vid.className = "sparkle-video";
     vid.src = v.video_url;
     vid.poster = v.poster_url;
+    
+    // Explicitly set attributes for broader browser support (especially iOS Safari)
+    vid.setAttribute("autoplay", "");
+    vid.setAttribute("loop", "");
+    vid.setAttribute("muted", "");
+    vid.setAttribute("playsinline", "");
+    
     vid.autoplay = true;
     vid.loop = true;
     vid.muted = true;
     vid.playsInline = true;
+    
     grid.appendChild(vid);
   });
 
