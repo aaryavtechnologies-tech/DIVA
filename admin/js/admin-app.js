@@ -156,12 +156,14 @@ function paintOrders(list) {
     const tr = document.createElement("tr");
 
     const orderNumTd = document.createElement("td");
+    orderNumTd.setAttribute("data-label", "Order #");
     orderNumTd.innerHTML = "";
     const strong = document.createElement("strong");
     strong.textContent = order.order_number;
     orderNumTd.appendChild(strong);
 
     const custTd = document.createElement("td");
+    custTd.setAttribute("data-label", "Customer");
     const nameDiv = document.createElement("div");
     nameDiv.textContent = order.customer_name;
     const emailDiv = document.createElement("div");
@@ -174,6 +176,7 @@ function paintOrders(list) {
 
     const itemsTd = document.createElement("td");
     itemsTd.className = "admin-order-items";
+    itemsTd.setAttribute("data-label", "Items");
     (order.items || []).forEach(item => {
       const div = document.createElement("div");
       div.textContent = `${item.qty}× ${item.name}`;
@@ -182,18 +185,22 @@ function paintOrders(list) {
 
     const addrTd = document.createElement("td");
     addrTd.className = "admin-order-addr";
+    addrTd.setAttribute("data-label", "Address");
     addrTd.textContent = `${order.address_line1}${order.address_line2 ? ", " + order.address_line2 : ""}, ${order.city}, ${order.state} ${order.pincode}`;
 
     const totalTd = document.createElement("td");
+    totalTd.setAttribute("data-label", "Total");
     totalTd.textContent = inr(order.total);
 
     const paymentTd = document.createElement("td");
+    paymentTd.setAttribute("data-label", "Payment");
     const paySpan = document.createElement("span");
     paySpan.className = "badge-status badge-" + order.payment_status;
     paySpan.textContent = order.payment_status;
     paymentTd.appendChild(paySpan);
 
     const statusTd = document.createElement("td");
+    statusTd.setAttribute("data-label", "Order Status");
     const select = document.createElement("select");
     select.className = "status-select";
     ORDER_STATUSES.forEach(s => {
@@ -221,6 +228,7 @@ function paintOrders(list) {
 
     const dateTd = document.createElement("td");
     dateTd.classList.add("u-meta-date");
+    dateTd.setAttribute("data-label", "Placed");
     dateTd.textContent = formatDate(order.created_at);
 
     tr.append(orderNumTd, custTd, itemsTd, addrTd, totalTd, paymentTd, statusTd, dateTd);
@@ -285,20 +293,25 @@ function paintInquiries(list) {
     const tr = document.createElement("tr");
 
     const nameTd = document.createElement("td");
+    nameTd.setAttribute("data-label", "Name");
     nameTd.textContent = msg.name;
 
     const emailTd = document.createElement("td");
+    emailTd.setAttribute("data-label", "Email");
     emailTd.textContent = msg.email;
 
     const subjectTd = document.createElement("td");
+    subjectTd.setAttribute("data-label", "Subject");
     subjectTd.textContent = msg.subject || "—";
 
     const messageTd = document.createElement("td");
     messageTd.classList.add("u-meta-line-wrap");
+    messageTd.setAttribute("data-label", "Message");
     messageTd.textContent = msg.message;
 
     const dateTd = document.createElement("td");
     dateTd.classList.add("u-meta-date");
+    dateTd.setAttribute("data-label", "Received");
     dateTd.textContent = formatDate(msg.created_at);
 
     tr.append(nameTd, emailTd, subjectTd, messageTd, dateTd);
@@ -380,6 +393,7 @@ function paintProducts(list) {
     const tr = document.createElement("tr");
 
     const imgTd = document.createElement("td");
+    imgTd.setAttribute("data-label", "Image");
     const img = document.createElement("img");
     img.className = "admin-product-thumb";
     img.src = product.image_url || "../assets/logo.png";
@@ -393,14 +407,17 @@ function paintProducts(list) {
     }
 
     const nameTd = document.createElement("td");
+    nameTd.setAttribute("data-label", "Name");
     const strong = document.createElement("strong");
     strong.textContent = product.name;
     nameTd.appendChild(strong);
 
     const catTd = document.createElement("td");
+    catTd.setAttribute("data-label", "Category");
     catTd.textContent = product.category;
 
     const priceTd = document.createElement("td");
+    priceTd.setAttribute("data-label", "Price");
     priceTd.textContent = inr(product.price) + (product.compare_at ? " " : "");
     if (product.compare_at) {
       const was = document.createElement("span");
@@ -410,6 +427,7 @@ function paintProducts(list) {
     }
 
     const statusTd = document.createElement("td");
+    statusTd.setAttribute("data-label", "Status");
     const statusSpan = document.createElement("span");
     statusSpan.className = "badge-status " + (product.active ? "badge-active" : "badge-hidden");
     statusSpan.textContent = product.active ? "Visible" : "Hidden";
@@ -417,10 +435,12 @@ function paintProducts(list) {
 
     const updatedTd = document.createElement("td");
     updatedTd.classList.add("u-meta-date");
+    updatedTd.setAttribute("data-label", "Updated");
     updatedTd.textContent = formatDate(product.updated_at || product.created_at);
 
     const actionsTd = document.createElement("td");
     actionsTd.className = "admin-product-actions";
+    actionsTd.setAttribute("data-label", "Actions");
     const editBtn = document.createElement("button");
     editBtn.type = "button";
     editBtn.className = "admin-icon-btn";
@@ -676,7 +696,7 @@ function paintHeroVideos(list) {
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td style="padding-left:24px;">
+      <td data-label="Preview" style="padding-left:24px;">
         <div class="vid-preview-wrap vid-preview-clickable" data-video-src="${v.video_url}" title="Click to preview">
           <video src="${v.video_url}" poster="${v.poster_url || ''}" muted loop playsinline></video>
           <div class="vid-play-icon">
@@ -685,26 +705,26 @@ function paintHeroVideos(list) {
           <div class="vid-preview-overlay">Preview</div>
         </div>
       </td>
-      <td>
+      <td data-label="Title">
         <div class="vid-title">${title}</div>
         <div class="vid-meta">
           <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:-1px;"><path d="M12 19V9M8 13l4-4 4 4M20 16.5a4.5 4.5 0 00-3-8h-.3a7 7 0 00-13.4 2A4.5 4.5 0 005.5 19h11z"/></svg>
           Uploaded on ${dateStr}
         </div>
       </td>
-      <td>
+      <td data-label="Category">
         <span class="vid-category-pill ${catClass}">${catName}</span>
       </td>
-      <td>
+      <td data-label="Duration">
         <div class="vid-meta" style="font-size:.85rem; color:#4a4a4a;">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           00:15
         </div>
       </td>
-      <td>
+      <td data-label="Status">
         <span class="vid-status-pill vid-status-active">Active</span>
       </td>
-      <td style="padding-right:24px;">
+      <td data-label="Actions" style="padding-right:24px;">
         <div class="vid-actions-wrap">
           <button type="button" class="vid-icon-btn admin-edit-btn" data-id="${v.id}" title="Edit">
              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
