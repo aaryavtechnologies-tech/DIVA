@@ -1,36 +1,39 @@
 /* ============================================================
    Shared CORS lockdown for DIVA JEWELS edge functions.
    ------------------------------------------------------------
-   Only the production storefront origin is allowed to call these
-   functions from a browser. Everything else (curl, another site,
-   a stolen script tag on a different domain) is rejected at the
-   CORS layer before your handler logic even runs.
-
-   To allow a second origin (e.g. a staging site), add it to
-   ALLOWED_ORIGINS below — do NOT switch to reflecting the request's
-   Origin header verbatim, since that defeats the allowlist.
+   Allows production storefront origins, cloudflare pages preview
+   origins, and local development origins while rejecting
+   unauthorized origins.
    ============================================================ */
 
 const ALLOWED_ORIGINS = [
   "https://divajewels.shop",
   "https://www.divajewels.shop",
-  // TODO: remove before going live — local testing only.
   "http://localhost:8000",
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "http://localhost:5500",
+  "http://127.0.0.1:8000",
+  "http://127.0.0.1:5500",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:5173"
 ];
 
 /** Returns the right Access-Control-Allow-Origin value for this request's
  *  Origin header, or null if the origin isn't on the allowlist. */
 export function resolveOrigin(origin: string | null): string | null {
   if (!origin) return null;
-  return ALLOWED_ORIGINS.includes(origin) ? origin : null;
+  if (ALLOWED_ORIGINS.includes(origin)) return origin;
+  // Allow Cloudflare Pages deployments (*.pages.dev)
+  if (/^https:\/\/[a-zA-Z0-9-]+\.pages\.dev$/.test(origin)) {
+    return origin;
+  }
+  return null;
 }
 
 export function buildCorsHeaders(origin: string | null): HeadersInit {
   const allowed = resolveOrigin(origin);
   return {
-    // Falls back to the primary domain if the Origin header is missing/blocked,
-    // so preflight requests still get a well-formed (if unusable) response
-    // instead of throwing before we can return a clean 403.
     "Access-Control-Allow-Origin": allowed || ALLOWED_ORIGINS[0],
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",

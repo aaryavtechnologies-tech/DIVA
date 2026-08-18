@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Bag — Diva Jewels</title>
 <meta name="description" content="Review your bag and check out securely.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com https://*.supabase.co data: https://res.cloudinary.com; media-src 'self' https://*.supabase.co https://res.cloudinary.com https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com https://cdn.razorpay.com https://static.cloudflareinsights.com; connect-src 'self' https://*.supabase.co https://api.razorpay.com https://lumberjack.razorpay.com https://cloudflareinsights.com https://api.cloudinary.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com https://plus.unsplash.com https://*.supabase.co data: https://res.cloudinary.com https://*.razorpay.com; media-src 'self' https://*.supabase.co https://res.cloudinary.com https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://unpkg.com https://checkout.razorpay.com https://cdn.razorpay.com https://static.cloudflareinsights.com; connect-src 'self' https://*.supabase.co https://api.razorpay.com https://*.razorpay.com https://lumberjack.razorpay.com https://cloudflareinsights.com https://api.cloudinary.com; frame-src https://api.razorpay.com https://checkout.razorpay.com https://*.razorpay.com; base-uri 'self'; form-action 'self'; object-src 'none';">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -185,10 +185,12 @@
       <div class="cart-empty">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 12l5 5L20 6"/></svg>
         <h3>Order Received</h3>
-        <p>Order <strong data-confirm-order-number></strong> for <strong data-confirm-total></strong> has been saved.</p>
+        <p>Order <strong data-confirm-order-number></strong> for <strong data-confirm-total></strong> has been placed.</p>
         <p data-confirm-payment-note></p>
-        <a href="products.html" class="btn btn-primary">Continue Shopping</a>
-
+        <div class="u-flex-gap14 u-justify-center u-mt-18">
+          <a href="orders.html" class="btn btn-outline">View My Orders</a>
+          <a href="products.html" class="btn btn-primary">Continue Shopping</a>
+        </div>
       </div>
     </div>
 
@@ -197,15 +199,13 @@
   </div>
 </section>
 
-<!-- Dummy payment modal — simulates a Razorpay payment so the checkout
-     flow feels real even before live Razorpay keys are wired up. -->
+<!-- Payment modal / loading transition -->
 <div class="modal-overlay" data-payment-modal>
   <div class="modal-box">
-    <span class="demo-tag">Demo Payment</span>
     <div data-payment-processing>
       <div class="modal-spinner"></div>
-      <h3>Processing payment…</h3>
-      <p>Simulating your Razorpay payment — no real charge is made.</p>
+      <h3>Connecting to Secure Payment…</h3>
+      <p>Initiating your encrypted checkout session…</p>
     </div>
     <div class="hidden" data-payment-success>
       <svg class="modal-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12l5 5L20 6"/></svg>

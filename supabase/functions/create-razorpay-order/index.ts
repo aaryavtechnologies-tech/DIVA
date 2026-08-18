@@ -1,25 +1,17 @@
 /* ============================================================
-   DIVA JEWELS — create-razorpay-order
+   DIVA JEWELS — create-razorpay-order (Live Mode Production)
    ------------------------------------------------------------
-   Called from cart.html right after the order row is inserted into
-   Supabase (payment_status = 'pending'). This function:
+   Called from cart.html when customer proceeds to pay.
 
-   1. Locks down CORS to https://divajewels.shop only (see _shared/cors.ts).
-   2. Re-reads the order from the DATABASE using the service_role key —
-      never trusts an amount the browser sends — so a tampered request
-      can't create a Razorpay order for less than the real total.
-   3. Calls Razorpay's Orders API using RAZORPAY_KEY_ID / KEY_SECRET,
-      which live only in this function's environment (set via
-      `supabase secrets set`), never in frontend code or Cloudflare.
-   4. Saves the razorpay_order_id back onto the order row.
-   5. Returns only what the browser needs to open Razorpay Checkout:
-      { razorpayOrderId, keyId, amount, currency }. KEY_SECRET never
-      leaves this function.
+   Security:
+   1. Locked down CORS (see _shared/cors.ts).
+   2. Amount is ALWAYS read from the Supabase database using
+      service_role client — never trusted from client request body.
+   3. RAZORPAY_KEY_SECRET is kept strictly server-side in Edge Function.
+   4. Idempotency: reuses existing razorpay_order_id if already generated.
 
    Deploy:  supabase functions deploy create-razorpay-order
    Secrets: supabase secrets set RAZORPAY_KEY_ID=... RAZORPAY_KEY_SECRET=...
-   (SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are injected automatically
-   by the Supabase platform — you never set those yourself.)
    ============================================================ */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -32,33 +24,47 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 Deno.serve(async (req: Request) => {
   const corsResponse = handleCors(req);
-  if (corsResponse) return corsResponse; // preflight or blocked-origin — already handled
+  if (corsResponse) return corsResponse; // preflight or disallowed-origin
 
-  const headers = { ...buildCorsHeaders(req.headers.get("origin")), "Content-Type": "application/json" };
+  const headers = {
+    ...buildCorsHeaders(req.headers.get("origin")),
+    "Content-Type": "application/json"
+  };
 
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers });
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers
+    });
   }
 
   if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-    console.error("Missing RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET secrets.");
-    return new Response(JSON.stringify({ error: "Payments are not configured yet." }), { status: 500, headers });
+    console.error("Missing RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET in Supabase secrets.");
+    return new Response(
+      JSON.stringify({ error: "Payment gateway is not configured yet on the server." }),
+      { status: 500, headers }
+    );
   }
 
   let body: { orderNumber?: string };
   try {
     body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: "Invalid JSON body" }), { status: 400, headers });
+    return new Response(JSON.stringify({ error: "Invalid JSON request body" }), {
+      status: 400,
+      headers
+    });
   }
 
   const orderNumber = body.orderNumber?.trim();
   if (!orderNumber) {
-    return new Response(JSON.stringify({ error: "orderNumber is required" }), { status: 400, headers });
+    return new Response(JSON.stringify({ error: "orderNumber is required" }), {
+      status: 400,
+      headers
+    });
   }
 
-  // service_role client — bypasses RLS deliberately, this is trusted
-  // server code, not a browser request.
+  // Trusted server client using service_role key
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
   const { data: order, error: fetchError } = await supabase
@@ -68,33 +74,42 @@ Deno.serve(async (req: Request) => {
     .single();
 
   if (fetchError || !order) {
-    return new Response(JSON.stringify({ error: "Order not found" }), { status: 404, headers });
+    console.error("Order lookup failed:", fetchError);
+    return new Response(JSON.stringify({ error: "Order not found" }), {
+      status: 404,
+      headers
+    });
   }
 
   if (order.payment_status === "paid") {
-    return new Response(JSON.stringify({ error: "This order is already paid" }), { status: 409, headers });
+    return new Response(JSON.stringify({ error: "This order has already been paid." }), {
+      status: 409,
+      headers
+    });
   }
 
-  // Idempotency: if a Razorpay order was already created for this row
-  // (e.g. the customer refreshed mid-checkout), reuse it instead of
-  // creating a duplicate order on Razorpay's side.
+  const amountPaise = Math.round(Number(order.total) * 100);
+  if (isNaN(amountPaise) || amountPaise <= 0) {
+    return new Response(JSON.stringify({ error: "Invalid order amount." }), {
+      status: 400,
+      headers
+    });
+  }
+
+  // Idempotent reuse of existing Razorpay order id if already created
   if (order.razorpay_order_id) {
     return new Response(
       JSON.stringify({
         razorpayOrderId: order.razorpay_order_id,
         keyId: RAZORPAY_KEY_ID,
-        amount: Math.round(Number(order.total) * 100),
+        amount: amountPaise,
         currency: "INR",
       }),
       { status: 200, headers }
     );
   }
 
-  // Amount comes from the DATABASE row, never from the request body —
-  // this is what stops a tampered client from paying less than the
-  // real total.
-  const amountPaise = Math.round(Number(order.total) * 100);
-
+  // Call Razorpay API to generate live/test order
   const auth = btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`);
   const rzpResponse = await fetch("https://api.razorpay.com/v1/orders", {
     method: "POST",
@@ -106,27 +121,32 @@ Deno.serve(async (req: Request) => {
       amount: amountPaise,
       currency: "INR",
       receipt: order.order_number,
-      notes: { order_id: order.id, order_number: order.order_number },
+      notes: {
+        order_id: order.id,
+        order_number: order.order_number
+      },
     }),
   });
 
   if (!rzpResponse.ok) {
     const errText = await rzpResponse.text();
-    console.error("Razorpay order creation failed:", errText);
-    return new Response(JSON.stringify({ error: "Could not start payment. Please try again." }), { status: 502, headers });
+    console.error("Razorpay order creation error:", errText);
+    return new Response(
+      JSON.stringify({ error: "Could not initiate payment session with Razorpay." }),
+      { status: 502, headers }
+    );
   }
 
   const rzpOrder = await rzpResponse.json();
 
+  // Save the Razorpay order ID to the order row
   const { error: updateError } = await supabase
     .from("orders")
     .update({ razorpay_order_id: rzpOrder.id })
     .eq("id", order.id);
 
   if (updateError) {
-    console.error("Failed to save razorpay_order_id:", updateError);
-    // Not fatal to the checkout flow — the webhook can still match on
-    // receipt/order_number if this write failed — but log it loudly.
+    console.warn("Failed to persist razorpay_order_id to DB:", updateError);
   }
 
   return new Response(

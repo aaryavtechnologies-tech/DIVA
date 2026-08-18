@@ -281,12 +281,8 @@ function initPayment(){
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Supabase Edge Functions require a Bearer token at the gateway
-          // level (separate from your own app logic) or every call 401s
-          // before your function code runs. The anon key is safe to send
-          // here — it's the same public key already in supabase-client.js,
-          // and it does NOT grant the function any elevated access; the
-          // function still authenticates Razorpay itself server-side.
+          // Supabase Edge Functions require a Bearer token at the gateway level.
+          // The anon key is safe to send here and allows the edge function to execute.
           "Authorization": `Bearer ${window.DivaConfig.SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({ orderNumber: result.orderNumber })
@@ -294,65 +290,82 @@ function initPayment(){
 
       if(!edgeResponse.ok){
         const errBody = await edgeResponse.json().catch(() => ({}));
-        throw new Error(errBody.error || "Could not start payment.");
+        throw new Error(errBody.error || "Could not start payment. Please check payment gateway configuration.");
       }
 
       const { razorpayOrderId, keyId, amount, currency } = await edgeResponse.json();
 
+      if(!keyId || !razorpayOrderId){
+        throw new Error("Payment initialization returned incomplete order data.");
+      }
+
       const rzp = new Razorpay({
         key: keyId,
         amount,
-        currency,
+        currency: currency || "INR",
         order_id: razorpayOrderId,
         name: "Diva Jewels",
         description: `Order ${result.orderNumber}`,
+        image: "assets/logo.png",
         prefill: {
           name: orderPayload.customer.name,
           email: orderPayload.customer.email,
           contact: orderPayload.customer.phone
         },
+        notes: {
+          order_number: result.orderNumber,
+          customer_email: orderPayload.customer.email,
+          shipping_address: `${orderPayload.customer.address1}, ${orderPayload.customer.city} ${orderPayload.customer.pincode}`
+        },
         theme: { color: "#b8975a" },
-        handler: function(){
-          // This fires as soon as Razorpay's checkout reports success in
-          // the BROWSER. It's optimistic UI only — the razorpay-webhook
-          // edge function is the source of truth and is what actually
-          // flips payment_status to 'paid' after verifying the payment
-          // server-side. If the webhook hasn't landed yet when the admin
-          // looks, the order briefly shows "pending" — that's expected
-          // and safe, never a lost order.
+        handler: function(response){
+          // Fired on successful completion in the browser.
+          // The razorpay-webhook edge function is the server-side source of truth.
           goToStep("confirmed");
-          renderConfirmation(result.orderNumber, total, { paid: true });
+          renderConfirmation(result.orderNumber, total, {
+            paid: true,
+            paymentId: response.razorpay_payment_id
+          });
           Cart.clear();
         },
         modal: {
           ondismiss: function(){
-            // Customer closed the Razorpay widget without paying. The
-            // order row still exists as "pending" — nothing lost, they
-            // can retry from their orders page or we can follow up.
-            showToast("Payment cancelled — your order is saved and still waiting on payment.");
+            payBtn.disabled = false;
+            payBtn.textContent = `Pay ${formatINR(total)}`;
+            showToast("Payment window closed. Your order is saved in your account.");
           }
         }
       });
 
-      rzp.on("payment.failed", function(){
-        showToast("Payment failed — please try again or use a different method.");
+      rzp.on("payment.failed", function(response){
+        payBtn.disabled = false;
+        payBtn.textContent = `Pay ${formatINR(total)}`;
+        const reason = response.error?.description || "Payment was declined or cancelled.";
+        console.warn("Razorpay payment failed:", response.error);
+        showToast(`Payment failed: ${reason}`);
       });
 
       rzp.open();
     } catch(err){
+      payBtn.disabled = false;
+      payBtn.textContent = `Pay ${formatINR(total)}`;
       console.error("Razorpay handoff error:", err);
       showToast(err.message || "We couldn't start payment — please try again.");
     }
   });
 }
 
-function renderConfirmation(orderNumber, total, { paid } = {}){
+function renderConfirmation(orderNumber, total, { paid, paymentId } = {}){
   setText("[data-confirm-order-number]", orderNumber);
   setText("[data-confirm-total]", formatINR(total));
-  setText("[data-confirm-payment-note]", paid
-    ? "Payment simulated (demo) — this order is saved and waiting on an admin to confirm it, same as a real order would."
-    : "You'll receive a confirmation once payment is set up and confirmed.");
-
+  if(paid){
+    const msg = paymentId
+      ? `Payment received successfully (Ref: ${paymentId}). Your order has been placed and is being prepared with exquisite care.`
+      : "Payment confirmed! Your order has been placed and is being prepared with exquisite care.";
+    setText("[data-confirm-payment-note]", msg);
+  } else {
+    setText("[data-confirm-payment-note]", "Your order has been recorded. You can complete payment or track status in My Orders.");
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
