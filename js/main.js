@@ -418,6 +418,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (window.PRODUCTS) {
     window.PRODUCTS.sort((a,b) => {
+      // Out of stock items always go to the very bottom
+      if (a.out_of_stock && !b.out_of_stock) return 1;
+      if (!a.out_of_stock && b.out_of_stock) return -1;
+      
+      // Otherwise, prioritize tagged items
       const aTagged = a.is_trending || a.is_bestseller || a.is_promotional ? 1 : 0;
       const bTagged = b.is_trending || b.is_bestseller || b.is_promotional ? 1 : 0;
       return bTagged - aTagged;
