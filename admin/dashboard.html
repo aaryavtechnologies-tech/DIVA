@@ -265,7 +265,12 @@
 
         <div class="admin-form-row admin-form-row-2">
           <label>Category
-            <input type="text" data-field="category" required maxlength="60" placeholder="e.g. Necklaces">
+            <div style="display: flex; gap: 8px;">
+              <select data-field="category" required style="flex: 1; border: 1px solid var(--line); border-radius: 4px; padding: 0 12px; font-family: inherit; font-size: .95rem; background: #fff; height: 42px;">
+                <option value="" disabled selected>Select a category</option>
+              </select>
+              <button type="button" class="btn btn-outline btn-sm" id="add-category-btn" style="white-space: nowrap; height: 42px; margin-top: 0;">+ Add</button>
+            </div>
           </label>
           <label class="admin-checkbox-label">
             <input type="checkbox" data-field="active" checked>

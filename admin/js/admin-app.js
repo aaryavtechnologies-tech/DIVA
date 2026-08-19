@@ -350,6 +350,38 @@ function showToast(message) {
 let allProducts = [];
 let pendingUploadedImageUrl = null; // set after a successful file upload in the modal
 
+const DEFAULT_CATEGORIES = [
+  "Necklaces", "Rings", "Bracelets", "Earrings", "Sets", 
+  "GET 5 FOR 999", "10% DISCOUNT", "20% DISCOUNT"
+];
+
+function populateCategoryDropdown(additionalCategory = null) {
+  const select = document.querySelector('select[data-field="category"]');
+  if(!select) return;
+  const currentVal = select.value;
+  
+  const uniqueCats = new Set(DEFAULT_CATEGORIES);
+  allProducts.forEach(p => {
+    if(p.category) uniqueCats.add(p.category);
+  });
+  if(additionalCategory) uniqueCats.add(additionalCategory);
+  
+  select.innerHTML = '<option value="" disabled selected>Select a category</option>';
+  
+  Array.from(uniqueCats).sort().forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    select.appendChild(opt);
+  });
+  
+  if (additionalCategory) {
+    select.value = additionalCategory;
+  } else if (currentVal && uniqueCats.has(currentVal)) {
+    select.value = currentVal;
+  }
+}
+
 async function loadProducts() {
   const body = document.querySelector("[data-products-body]");
   const result = await window.DivaAdmin.adminFetchProducts();
@@ -367,6 +399,7 @@ async function loadProducts() {
   }
 
   allProducts = result.products;
+  populateCategoryDropdown();
   paintProducts(allProducts);
 
   const badge = document.querySelector("[data-products-badge]");
@@ -483,6 +516,8 @@ function openProductModal(product) {
   document.querySelector("[data-product-form-status]").textContent = "";
   document.querySelector("[data-product-form-status]").className = "form-status";
 
+  populateCategoryDropdown();
+
   const preview = document.querySelector("[data-image-preview]");
   const videoPreview = document.querySelector("[data-video-preview]");
 
@@ -532,6 +567,13 @@ function initProductModal() {
   document.querySelectorAll("[data-product-modal-close]").forEach(btn => btn.addEventListener("click", closeProductModal));
   document.querySelector("[data-product-modal]").addEventListener("click", (e) => {
     if (e.target === e.currentTarget) closeProductModal();
+  });
+
+  document.getElementById("add-category-btn")?.addEventListener("click", () => {
+    const newCat = prompt("Enter new category name (e.g. 30% DISCOUNT):");
+    if (newCat && newCat.trim()) {
+      populateCategoryDropdown(newCat.trim());
+    }
   });
 
   // Image upload → Supabase Storage, fills the URL field + preview.
