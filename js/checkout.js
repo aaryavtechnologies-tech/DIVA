@@ -234,10 +234,9 @@ function initPayment(){
 
     const result = await window.DivaSupabase.createOrder(orderPayload);
 
-    payBtn.disabled = false;
-    payBtn.textContent = `Pay ${formatINR(total)}`;
-
     if(!result.ok){
+      payBtn.disabled = false;
+      payBtn.textContent = `Pay ${formatINR(total)}`;
       showToast("We couldn't save your order — please try again.");
       return;
     }
@@ -253,6 +252,8 @@ function initPayment(){
       goToStep("confirmed");
       renderConfirmation(result.orderNumber, total, { paid: false });
       Cart.clear();
+      payBtn.disabled = false;
+      payBtn.textContent = `Pay ${formatINR(total)}`;
       return;
     }
 
@@ -273,8 +274,13 @@ function initPayment(){
       goToStep("confirmed");
       renderConfirmation(result.orderNumber, total, { paid: true });
       Cart.clear();
+      payBtn.disabled = false;
+      payBtn.textContent = `Pay ${formatINR(total)}`;
       return;
     }
+
+    // Update text to indicate Razorpay is loading
+    payBtn.textContent = "Connecting to Secure Payment…";
 
     try{
       const edgeResponse = await fetch(`${window.DivaConfig.EDGE_FUNCTIONS_URL}/create-razorpay-order`, {
