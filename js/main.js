@@ -314,7 +314,14 @@ function renderProductsPage(){
       const pill = Array.from(filterRow.querySelectorAll(".filter-pill")).find(p => p.textContent === cat);
       if(pill) pill.classList.add("active");
     }
-    paint(cat === "All" ? window.PRODUCTS : window.PRODUCTS.filter(p => p.category === cat));
+    
+    if (cat === "tag-Trending") {
+      paint(window.PRODUCTS.filter(p => p.is_trending));
+    } else if (cat === "tag-BestSeller") {
+      paint(window.PRODUCTS.filter(p => p.is_bestseller));
+    } else {
+      paint(cat === "All" ? window.PRODUCTS : window.PRODUCTS.filter(p => p.category === cat));
+    }
   }
 
   if(filterRow){
@@ -334,7 +341,9 @@ function renderProductsPage(){
 
   function checkHash(){
     const hash = decodeURIComponent(window.location.hash.slice(1));
-    if(hash && categories.includes(hash)) {
+    if (hash === "tag-Trending" || hash === "tag-BestSeller") {
+      applyFilter(hash);
+    } else if (hash && categories.includes(hash)) {
       applyFilter(hash);
     } else {
       applyFilter("All");

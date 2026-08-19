@@ -265,7 +265,11 @@ async function fetchProducts(){
     compareAt: p.compare_at != null ? Number(p.compare_at) : null,
     image: p.image_url,
     video: p.video_url || null,
-    description: p.description || ""
+    description: p.description || "",
+    out_of_stock: !!p.out_of_stock,
+    is_trending: !!p.is_trending,
+    is_bestseller: !!p.is_bestseller,
+    is_promotional: !!p.is_promotional
   }));
   return { ok: true, products };
 }
