@@ -547,6 +547,9 @@ function openProductModal(product) {
     form.querySelector('[data-field="name"]').value = product.name;
     form.querySelector('[data-field="category"]').value = product.category;
     form.querySelector('[data-field="active"]').checked = !!product.active;
+    form.querySelector('[data-field="tagTrending"]').checked = !!product.is_trending;
+    form.querySelector('[data-field="tagBestSeller"]').checked = !!product.is_bestseller;
+    form.querySelector('[data-field="tagPromotional"]').checked = !!product.is_promotional;
     form.querySelector('[data-field="price"]').value = product.price;
     form.querySelector('[data-field="compareAt"]').value = product.compare_at ?? "";
     form.querySelector('[data-field="imageUrl"]').value = product.image_url || "";
@@ -560,6 +563,9 @@ function openProductModal(product) {
     document.querySelector("[data-product-modal-title]").textContent = "Add Product";
     form.querySelector('[data-field="id"]').value = "";
     form.querySelector('[data-field="active"]').checked = true;
+    form.querySelector('[data-field="tagTrending"]').checked = false;
+    form.querySelector('[data-field="tagBestSeller"]').checked = false;
+    form.querySelector('[data-field="tagPromotional"]').checked = false;
     preview.classList.add("hidden");
     videoPreview.classList.add("hidden");
   }
@@ -665,6 +671,10 @@ function initProductModal() {
     const videoUrl = form.querySelector('[data-field="videoUrl"]').value.trim();
     const description = form.querySelector('[data-field="description"]').value.trim();
     const active = form.querySelector('[data-field="active"]').checked;
+    
+    const is_trending = form.querySelector('[data-field="tagTrending"]').checked;
+    const is_bestseller = form.querySelector('[data-field="tagBestSeller"]').checked;
+    const is_promotional = form.querySelector('[data-field="tagPromotional"]').checked;
 
     if (!name || !category || !Number.isFinite(price) || price < 0) {
       statusEl.textContent = "Please fill in a name, category, and a valid price.";
@@ -678,7 +688,10 @@ function initProductModal() {
       image_url: imageUrl,
       video_url: videoUrl || null,
       description,
-      active
+      active,
+      is_trending,
+      is_bestseller,
+      is_promotional
     };
 
     saveBtn.disabled = true;

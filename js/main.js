@@ -101,6 +101,15 @@ function buildProductCard(product){
   link.appendChild(img);
   media.appendChild(link);
 
+  if (product.is_trending || product.is_bestseller || product.is_promotional) {
+    const tagBadge = document.createElement("div");
+    tagBadge.className = "bookmark-tag";
+    if (product.is_trending) tagBadge.textContent = "Trending";
+    else if (product.is_bestseller) tagBadge.textContent = "Best Seller";
+    else if (product.is_promotional) tagBadge.textContent = "Promotional";
+    media.appendChild(tagBadge);
+  }
+
   if (product.out_of_stock) {
     card.classList.add("out-of-stock");
     const oosBadge = document.createElement("span");
@@ -397,6 +406,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Wait for the live product fetch (or its fallback) before painting
   // any product grids, so prices/images reflect what's actually live.
   if(window.PRODUCTS_READY) await window.PRODUCTS_READY;
+
+  if (window.PRODUCTS) {
+    window.PRODUCTS.sort((a,b) => {
+      const aTagged = a.is_trending || a.is_bestseller || a.is_promotional ? 1 : 0;
+      const bTagged = b.is_trending || b.is_bestseller || b.is_promotional ? 1 : 0;
+      return bTagged - aTagged;
+    });
+  }
+
   renderFeatured();
   renderProductsPage();
   renderHeroVideos();
