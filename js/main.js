@@ -107,7 +107,7 @@ function buildProductCard(product){
     if (product.is_trending) tagBadge.textContent = "Trending";
     else if (product.is_bestseller) tagBadge.textContent = "Best Seller";
     else if (product.is_promotional) tagBadge.textContent = "Promotional";
-    media.appendChild(tagBadge);
+    card.appendChild(tagBadge);
   }
 
   if (product.out_of_stock) {
