@@ -288,6 +288,9 @@ section{ padding:88px 0; }
 @media (max-width:460px){ .product-grid{ grid-template-columns:1fr 1fr; } }
 
 .product-card{ position:relative; text-align:left; display:flex; flex-direction:column; height:100%; }
+.product-card.out-of-stock { opacity: 0.8; }
+.product-card.out-of-stock .product-media img { filter: grayscale(80%) brightness(70%); }
+.oos-banner { position: absolute; top: 50%; left: -10px; right: -10px; transform: translateY(-50%) rotate(-5deg); background: rgba(169, 72, 58, 0.95); color: #fff; text-align: center; padding: 8px 0; font-weight: 700; letter-spacing: 0.15em; font-size: 0.8rem; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 .product-media{
   position:relative; aspect-ratio:1/1; border-radius:50%; overflow:hidden;
   background:var(--cream-deep); margin:0 auto 16px; box-shadow:var(--shadow-card); width:100%;

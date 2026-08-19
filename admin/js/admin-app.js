@@ -479,12 +479,32 @@ function paintProducts(list) {
     editBtn.className = "admin-icon-btn";
     editBtn.textContent = "Edit";
     editBtn.addEventListener("click", () => openProductModal(product));
+    
+    const outOfStockBtn = document.createElement("button");
+    outOfStockBtn.type = "button";
+    outOfStockBtn.className = "admin-icon-btn";
+    outOfStockBtn.textContent = product.out_of_stock ? "In Stock" : "OOS";
+    if (product.out_of_stock) outOfStockBtn.classList.add("danger");
+    outOfStockBtn.addEventListener("click", async () => {
+      const newState = !product.out_of_stock;
+      if (!confirm(`Mark "${product.name}" as ${newState ? 'Out of Stock' : 'In Stock'}?`)) return;
+      outOfStockBtn.disabled = true;
+      const res = await window.DivaAdmin.adminUpdateProduct(product.id, { out_of_stock: newState });
+      if (res.ok) {
+        showToast(`"${product.name}" is now ${newState ? 'Out of Stock' : 'In Stock'}`);
+        loadProducts();
+      } else {
+        outOfStockBtn.disabled = false;
+        showToast("Couldn't update stock status: " + (res.error || "unknown error"));
+      }
+    });
+
     const deleteBtn = document.createElement("button");
     deleteBtn.type = "button";
     deleteBtn.className = "admin-icon-btn danger";
     deleteBtn.textContent = "Delete";
     deleteBtn.addEventListener("click", () => deleteProduct(product));
-    actionsTd.append(editBtn, deleteBtn);
+    actionsTd.append(editBtn, outOfStockBtn, deleteBtn);
 
     tr.append(imgTd, nameTd, catTd, priceTd, statusTd, updatedTd, actionsTd);
     body.appendChild(tr);

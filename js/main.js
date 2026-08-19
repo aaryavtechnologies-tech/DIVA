@@ -101,6 +101,14 @@ function buildProductCard(product){
   link.appendChild(img);
   media.appendChild(link);
 
+  if (product.out_of_stock) {
+    card.classList.add("out-of-stock");
+    const oosBadge = document.createElement("span");
+    oosBadge.className = "oos-banner";
+    oosBadge.textContent = "OUT OF STOCK";
+    media.appendChild(oosBadge);
+  }
+
   if(product.video){
     const playBtn = document.createElement("button");
     playBtn.type = "button";
@@ -141,8 +149,13 @@ function buildProductCard(product){
   const addBtn = document.createElement("button");
   addBtn.className = "add-cart-btn";
   addBtn.type = "button";
-  addBtn.textContent = "Add to Cart";
-  addBtn.addEventListener("click", () => handleAddToCart(product.id, addBtn));
+  if (product.out_of_stock) {
+    addBtn.disabled = true;
+    addBtn.textContent = "Out of Stock";
+  } else {
+    addBtn.textContent = "Add to Cart";
+    addBtn.addEventListener("click", () => handleAddToCart(product.id, addBtn));
+  }
   quick.appendChild(addBtn);
 
   card.append(media, catEl, nameEl, priceEl, quick);
