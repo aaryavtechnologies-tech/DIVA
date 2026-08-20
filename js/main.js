@@ -92,13 +92,62 @@ function buildProductCard(product){
   media.className = "product-media";
 
   const link = document.createElement("a");
-  link.href = `products.html#${encodeURIComponent(product.id)}`;
+  link.href = `product-details.html?id=${encodeURIComponent(product.id)}`;
   link.setAttribute("aria-label", product.name);
-  const img = document.createElement("img");
-  img.src = product.image;
-  img.alt = product.name;
-  img.loading = "lazy";
-  link.appendChild(img);
+  link.className = "product-link-slider";
+  
+  const images = (product.image_urls && product.image_urls.length > 0) ? product.image_urls : [product.image];
+  
+  if (images.length > 1) {
+    const imgs = images.map((url, i) => {
+      const img = document.createElement("img");
+      img.src = url;
+      img.alt = product.name;
+      img.loading = "lazy";
+      img.className = i === 0 ? "slide active" : "slide";
+      link.appendChild(img);
+      return img;
+    });
+    
+    const dotsWrap = document.createElement("div");
+    dotsWrap.className = "card-slider-dots";
+    const dots = images.map((_, i) => {
+      const dot = document.createElement("span");
+      dot.className = i === 0 ? "dot active" : "dot";
+      dotsWrap.appendChild(dot);
+      return dot;
+    });
+    link.appendChild(dotsWrap);
+    
+    let currentSlide = 0;
+    let slideInterval;
+    
+    link.addEventListener("mouseenter", () => {
+      slideInterval = setInterval(() => {
+        imgs[currentSlide].classList.remove("active");
+        dots[currentSlide].classList.remove("active");
+        currentSlide = (currentSlide + 1) % images.length;
+        imgs[currentSlide].classList.add("active");
+        dots[currentSlide].classList.add("active");
+      }, 1500);
+    });
+    
+    link.addEventListener("mouseleave", () => {
+      clearInterval(slideInterval);
+      imgs[currentSlide].classList.remove("active");
+      dots[currentSlide].classList.remove("active");
+      currentSlide = 0;
+      imgs[0].classList.add("active");
+      dots[0].classList.add("active");
+    });
+  } else {
+    const img = document.createElement("img");
+    img.src = product.image || 'assets/logo.png';
+    img.alt = product.name;
+    img.loading = "lazy";
+    link.appendChild(img);
+  }
+  
   media.appendChild(link);
 
   if (product.is_trending || product.is_bestseller || product.is_promotional) {

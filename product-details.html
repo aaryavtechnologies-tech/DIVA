@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Details — Diva Jewels</title>
+<meta name="description" content="View product details on Diva Jewels.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Base styles for the product details layout */
+  .product-details-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+  }
+  @media (max-width: 900px) {
+    .product-details-wrap {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      padding: 40px 24px;
+    }
+  }
+
+  /* Product Gallery Slider */
+  .product-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .product-gallery-main {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/5;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8f6f2;
+  }
+  
+  .product-gallery-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.3s ease;
+  }
+  
+  .product-gallery-thumbs {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  
+  .product-gallery-thumbs::-webkit-scrollbar {
+    height: 6px;
+  }
+  .product-gallery-thumbs::-webkit-scrollbar-thumb {
+    background: #e2ded5;
+    border-radius: 3px;
+  }
+  
+  .gallery-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+    cursor: pointer;
+    border: 2px solid transparent;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+  }
+  
+  .gallery-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .gallery-thumb:hover, .gallery-thumb.active {
+    opacity: 1;
+  }
+  .gallery-thumb.active {
+    border-color: var(--ink);
+  }
+
+  /* Product Info */
+  .product-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .product-info-cat {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+    display: block;
+  }
+  
+  .product-info h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: var(--ink);
+    margin-bottom: 24px;
+    line-height: 1.2;
+  }
+  
+  .product-info-price {
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .product-info-price .was {
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    text-decoration: line-through;
+  }
+  
+  .product-info-desc {
+    font-size: 1.1rem;
+    color: var(--ink);
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+  
+  .product-info-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .product-info-actions .btn {
+    width: 100%;
+    text-align: center;
+    padding: 18px 24px;
+    font-size: 1.1rem;
+    border-radius: 4px;
+  }
+
+  .product-tags-wrap {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .detail-tag {
+    background: var(--line);
+    color: var(--ink);
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  
+  .oos-text {
+    color: #ff4d4f;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+
+  /* Skeleton Loading State */
+  .skeleton-box {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+  }
+  @keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <a class="brand" href="index.html">
+      <span class="brand-badge"><img src="assets/logo.png" alt="Diva Jewels crest"></span>
+      <span class="brand-word">Diva<small>Jewels</small></span>
+    </a>
+
+    <nav class="main-nav" id="main-nav">
+      <button type="button" class="nav-close" data-nav-close aria-label="Close menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <a href="index.html">Home</a>
+      <a href="products.html" class="active">Shop</a>
+      <a href="about.html">Our Story</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+
+    <div class="header-actions">
+      <a class="icon-btn" href="products.html" aria-label="Search products">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      </a>
+      <a class="icon-btn" href="cart.html" aria-label="View cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+        <span class="cart-count" data-cart-count>0</span>
+      </a>
+      <div class="account-menu" data-account-menu>
+        <button type="button" class="account-trigger" aria-label="Account" aria-expanded="false" data-account-trigger>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7.5" r="4"/></svg>
+        </button>
+        <div class="account-dropdown" data-account-dropdown></div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="nav-backdrop" data-nav-backdrop></div>
+
+<main>
+  <div class="product-details-wrap" id="product-details-container">
+    <!-- Skeleton loader shown while waiting for PRODUCTS_READY -->
+    <div class="product-gallery">
+      <div class="product-gallery-main skeleton-box"></div>
+      <div class="product-gallery-thumbs">
+        <div class="gallery-thumb skeleton-box"></div>
+        <div class="gallery-thumb skeleton-box"></div>
+        <div class="gallery-thumb skeleton-box"></div>
+      </div>
+    </div>
+    <div class="product-info">
+      <div class="skeleton-box" style="width: 100px; height: 16px; margin-bottom: 12px;"></div>
+      <div class="skeleton-box" style="width: 80%; height: 48px; margin-bottom: 24px;"></div>
+      <div class="skeleton-box" style="width: 150px; height: 28px; margin-bottom: 30px;"></div>
+      <div class="skeleton-box" style="width: 100%; height: 100px; margin-bottom: 40px;"></div>
+      <div class="skeleton-box" style="width: 100%; height: 60px;"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <a class="brand u-mb-14" href="index.html">
+          <span class="brand-badge"><img src="assets/logo.png" alt="Diva Jewels crest"></span>
+          <span class="brand-word">Diva<small>Jewels</small></span>
+        </a>
+        <p>Handcrafted jewelry in cream, gold and light — designed to be worn often and kept for years.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="products.html#Necklaces">Necklaces</a></li>
+          <li><a href="products.html#Rings">Rings</a></li>
+          <li><a href="products.html#Earrings">Earrings</a></li>
+          <li><a href="products.html#Bracelets">Bracelets</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">Our Story</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="cart.html">Your Bag</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Customer Care</h4>
+        <ul>
+          <li><a href="contact.html">Shipping &amp; Returns</a></li>
+          <li><a href="contact.html">Track an Order</a></li>
+          <li><a href="contact.html">FAQs</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Diva Jewels. All rights reserved.</span>
+      <div class="footer-bottom-right">
+        <span>Payments secured &amp; encrypted at checkout</span>
+        <a class="footer-admin-link" href="admin/login.html">Store Admin</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/products-data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Wait for live product fetch to finish
+    if(window.PRODUCTS_READY) await window.PRODUCTS_READY;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get("id");
+    const container = document.getElementById("product-details-container");
+
+    if (!productId || !window.PRODUCTS) {
+      container.innerHTML = "<p class='center' style='grid-column: 1 / -1; margin-top: 60px;'>Product not found. <a href='products.html' style='color: var(--primary); text-decoration: underline;'>Return to Shop</a></p>";
+      return;
+    }
+
+    const product = window.PRODUCTS.find(p => p.id === productId);
+    if (!product) {
+      container.innerHTML = "<p class='center' style='grid-column: 1 / -1; margin-top: 60px;'>Product not found. <a href='products.html' style='color: var(--primary); text-decoration: underline;'>Return to Shop</a></p>";
+      return;
+    }
+
+    // Set page title
+    document.title = product.name + " — Diva Jewels";
+
+    // Gather images
+    const images = (product.image_urls && product.image_urls.length > 0) 
+      ? product.image_urls 
+      : (product.image ? [product.image] : []);
+    
+    // Build Gallery HTML
+    let galleryHTML = `<div class="product-gallery">
+      <div class="product-gallery-main">
+        <img id="main-product-image" src="${images[0] || 'assets/logo.png'}" alt="${product.name}">
+      </div>`;
+    
+    if (images.length > 1) {
+      galleryHTML += `<div class="product-gallery-thumbs">`;
+      images.forEach((img, idx) => {
+        galleryHTML += `<div class="gallery-thumb ${idx === 0 ? 'active' : ''}" data-img-idx="${idx}">
+          <img src="${img}" alt="Thumbnail ${idx + 1}">
+        </div>`;
+      });
+      galleryHTML += `</div>`;
+    }
+    galleryHTML += `</div>`;
+
+    // Build Info HTML
+    let tagsHTML = `<div class="product-tags-wrap">`;
+    if (product.is_trending) tagsHTML += `<span class="detail-tag">Trending</span>`;
+    if (product.is_bestseller) tagsHTML += `<span class="detail-tag">Best Seller</span>`;
+    if (product.is_promotional) tagsHTML += `<span class="detail-tag">Promotional</span>`;
+    tagsHTML += `</div>`;
+    if (tagsHTML === `<div class="product-tags-wrap"></div>`) tagsHTML = '';
+
+    let priceHTML = `<div class="product-info-price">`;
+    if (product.compareAt) {
+      priceHTML += `<span class="was">${window.formatINR(product.compareAt)}</span>`;
+    }
+    priceHTML += `<span>${window.formatINR(product.price)}</span></div>`;
+
+    const isOos = product.out_of_stock;
+    const oosHTML = isOos ? `<div class="oos-text">Currently Out of Stock</div>` : ``;
+    
+    const infoHTML = `<div class="product-info">
+      ${tagsHTML}
+      <span class="product-info-cat">${product.category}</span>
+      <h1>${product.name}</h1>
+      ${priceHTML}
+      <p class="product-info-desc">${product.description || ''}</p>
+      ${oosHTML}
+      <div class="product-info-actions">
+        <button type="button" class="btn btn-primary" id="add-to-cart-btn" ${isOos ? 'disabled' : ''}>
+          ${isOos ? 'Out of Stock' : 'Add to Cart'}
+        </button>
+      </div>
+    </div>`;
+
+    // Render
+    container.innerHTML = galleryHTML + infoHTML;
+
+    // Attach Gallery logic
+    if (images.length > 1) {
+      const mainImg = document.getElementById("main-product-image");
+      const thumbs = document.querySelectorAll(".gallery-thumb");
+      thumbs.forEach(thumb => {
+        thumb.addEventListener("click", () => {
+          thumbs.forEach(t => t.classList.remove("active"));
+          thumb.classList.add("active");
+          const idx = parseInt(thumb.getAttribute("data-img-idx"));
+          mainImg.style.opacity = 0;
+          setTimeout(() => {
+            mainImg.src = images[idx];
+            mainImg.style.opacity = 1;
+          }, 150);
+        });
+      });
+    }
+
+    // Attach Add to Cart logic
+    const addBtn = document.getElementById("add-to-cart-btn");
+    if (addBtn && !isOos) {
+      addBtn.addEventListener("click", () => {
+        if(window.handleAddToCart) {
+          window.handleAddToCart(product.id, addBtn);
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

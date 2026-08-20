@@ -729,3 +729,50 @@ body{ overflow-x:hidden; }
   .hero-cta{ flex-direction:column; align-items:stretch; }
   .hero-cta .btn{ width:100%; }
 }
+
+/* ---------- Product Card Slider ---------- */
+.product-link-slider {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.product-link-slider img.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.product-link-slider img.slide.active {
+  opacity: 1;
+}
+/* If only one image exists, position it correctly */
+.product-link-slider > img:not(.slide) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.card-slider-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.product-media:hover .card-slider-dots {
+  opacity: 1;
+}
+.card-slider-dots .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+}
+.card-slider-dots .dot.active {
+  background: #fff;
+}

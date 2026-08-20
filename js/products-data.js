@@ -20,6 +20,11 @@ const DEMO_PRODUCTS = [
     price: 2499,
     compareAt: null,
     image: "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=800&q=80",
+    image_urls: [
+      "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1599643478524-fb66f7ca066b?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=800&q=80"
+    ],
     video: "https://assets.mixkit.co/videos/preview/mixkit-woman-putting-on-a-diamond-necklace-42285-large.mp4",
     description: "A fine gold-plated chain with a softly hammered finish that catches light with every turn. Layer it or wear it alone."
   },

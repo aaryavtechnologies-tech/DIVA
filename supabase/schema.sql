@@ -207,6 +207,7 @@ create table if not exists public.products (
   price        numeric(10,2) not null check (price >= 0),
   compare_at   numeric(10,2) check (compare_at is null or compare_at >= 0),
   image_url    text not null default '',
+  image_urls   text[] not null default '{}',
   description  text not null default '',
   active       boolean not null default true,
   sort_order   integer not null default 0,
@@ -215,6 +216,7 @@ create table if not exists public.products (
 );
 
 alter table public.products add column if not exists video_url text;
+alter table public.products add column if not exists image_urls text[] not null default '{}';
 create index if not exists products_active_idx   on public.products (active);
 create index if not exists products_category_idx on public.products (category);
 create index if not exists products_sort_idx     on public.products (sort_order);

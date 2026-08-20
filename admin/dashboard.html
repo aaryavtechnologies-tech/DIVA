@@ -303,16 +303,17 @@
         </div>
 
         <div class="admin-form-row">
-          <label>Image
-            <input type="text" data-field="imageUrl" placeholder="https://… (paste a link, or upload a file below)">
+          <label>Images (Up to 5)
+            <input type="text" data-field="imageUrl" placeholder="https://… (paste a link, or upload below) - Primary Image">
           </label>
           <div class="admin-image-upload">
-            <img data-image-preview class="hidden" alt="Preview">
-            <label class="btn btn-outline btn-sm admin-upload-btn">
+            <div data-image-gallery class="admin-image-gallery"></div>
+            <label class="btn btn-outline btn-sm admin-upload-btn" id="multi-image-upload-btn">
               Upload image
-              <input type="file" accept="image/*" data-image-file class="u-hidden">
+              <input type="file" accept="image/*" data-image-file class="u-hidden" multiple>
             </label>
             <span class="admin-upload-status" data-upload-status></span>
+            <div class="admin-field-hint" style="margin-top: 4px;">First image is the primary cover image. You can upload up to 5 images.</div>
           </div>
         </div>
 

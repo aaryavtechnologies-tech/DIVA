@@ -264,6 +264,7 @@ async function fetchProducts(){
     price: Number(p.price),
     compareAt: p.compare_at != null ? Number(p.compare_at) : null,
     image: p.image_url,
+    image_urls: p.image_urls || (p.image_url ? [p.image_url] : []),
     video: p.video_url || null,
     description: p.description || "",
     out_of_stock: !!p.out_of_stock,

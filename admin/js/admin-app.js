@@ -348,7 +348,7 @@ function showToast(message) {
 
 /* ---------- Products panel ---------- */
 let allProducts = [];
-let pendingUploadedImageUrl = null; // set after a successful file upload in the modal
+let pendingUploadedImageUrls = []; // stores up to 5 image URLs
 
 const DEFAULT_CATEGORIES = [
   "Necklaces", "Rings", "Bracelets", "Earrings", "Sets", 
@@ -530,7 +530,7 @@ function openProductModal(product) {
   const modal = document.querySelector("[data-product-modal]");
   const form = getProductForm();
   form.reset();
-  pendingUploadedImageUrl = null;
+  pendingUploadedImageUrls = [];
   document.querySelector("[data-upload-status]").textContent = "";
   document.querySelector("[data-video-upload-status]").textContent = "";
   document.querySelector("[data-product-form-status]").textContent = "";
@@ -538,8 +538,67 @@ function openProductModal(product) {
 
   populateCategoryDropdown();
 
-  const preview = document.querySelector("[data-image-preview]");
+  const gallery = document.querySelector("[data-image-gallery]");
   const videoPreview = document.querySelector("[data-video-preview]");
+
+  function renderGallery() {
+    gallery.innerHTML = "";
+    pendingUploadedImageUrls.forEach((url, idx) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "gallery-item";
+      wrapper.style.position = "relative";
+      wrapper.style.display = "inline-block";
+      wrapper.style.marginRight = "8px";
+      wrapper.style.marginBottom = "8px";
+      
+      const img = document.createElement("img");
+      img.src = url;
+      img.style.width = "60px";
+      img.style.height = "60px";
+      img.style.objectFit = "cover";
+      img.style.borderRadius = "4px";
+      
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.textContent = "×";
+      removeBtn.className = "remove-img-btn";
+      removeBtn.style.position = "absolute";
+      removeBtn.style.top = "-5px";
+      removeBtn.style.right = "-5px";
+      removeBtn.style.background = "#ff4d4f";
+      removeBtn.style.color = "#fff";
+      removeBtn.style.border = "none";
+      removeBtn.style.borderRadius = "50%";
+      removeBtn.style.width = "20px";
+      removeBtn.style.height = "20px";
+      removeBtn.style.cursor = "pointer";
+      removeBtn.style.fontSize = "14px";
+      removeBtn.style.lineHeight = "1";
+      removeBtn.onclick = () => {
+        pendingUploadedImageUrls.splice(idx, 1);
+        renderGallery();
+        form.querySelector('[data-field="imageUrl"]').value = pendingUploadedImageUrls[0] || "";
+      };
+      
+      wrapper.appendChild(img);
+      wrapper.appendChild(removeBtn);
+      gallery.appendChild(wrapper);
+    });
+  }
+
+  // Allow manual entry to add to array
+  const imageUrlInput = form.querySelector('[data-field="imageUrl"]');
+  // Overwrite listener below clears it
+  const newListener = (e) => {
+    const val = e.target.value.trim();
+    if (val && !pendingUploadedImageUrls.includes(val) && pendingUploadedImageUrls.length < 5) {
+        pendingUploadedImageUrls[0] = val; // Set primary
+        renderGallery();
+    }
+  };
+  imageUrlInput.removeEventListener("input", imageUrlInput._listener || function(){});
+  imageUrlInput._listener = newListener;
+  imageUrlInput.addEventListener("input", newListener);
 
   if (product) {
     document.querySelector("[data-product-modal-title]").textContent = "Edit Product";
@@ -552,11 +611,13 @@ function openProductModal(product) {
     form.querySelector('[data-field="tagPromotional"]').checked = !!product.is_promotional;
     form.querySelector('[data-field="price"]').value = product.price;
     form.querySelector('[data-field="compareAt"]').value = product.compare_at ?? "";
-    form.querySelector('[data-field="imageUrl"]').value = product.image_url || "";
     form.querySelector('[data-field="videoUrl"]').value = product.video_url || "";
     form.querySelector('[data-field="description"]').value = product.description || "";
-    if (product.image_url) { preview.src = product.image_url; preview.classList.remove("hidden"); }
-    else preview.classList.add("hidden");
+    
+    pendingUploadedImageUrls = product.image_urls && product.image_urls.length > 0 ? [...product.image_urls] : (product.image_url ? [product.image_url] : []);
+    form.querySelector('[data-field="imageUrl"]').value = pendingUploadedImageUrls[0] || "";
+    renderGallery();
+
     if (product.video_url) { videoPreview.src = product.video_url; videoPreview.classList.remove("hidden"); }
     else videoPreview.classList.add("hidden");
   } else {
@@ -566,7 +627,7 @@ function openProductModal(product) {
     form.querySelector('[data-field="tagTrending"]').checked = false;
     form.querySelector('[data-field="tagBestSeller"]').checked = false;
     form.querySelector('[data-field="tagPromotional"]').checked = false;
-    preview.classList.add("hidden");
+    renderGallery();
     videoPreview.classList.add("hidden");
   }
 
@@ -604,29 +665,79 @@ function initProductModal() {
 
   // Image upload → Supabase Storage, fills the URL field + preview.
   document.querySelector("[data-image-file]").addEventListener("change", async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const status = document.querySelector("[data-upload-status]");
-    status.textContent = "Uploading…";
-    const res = await window.DivaAdmin.adminUploadProductImage(file);
-    if (res.ok) {
-      pendingUploadedImageUrl = res.url;
-      getProductForm().querySelector('[data-field="imageUrl"]').value = res.url;
-      const preview = document.querySelector("[data-image-preview]");
-      preview.src = res.url;
-      preview.classList.remove("hidden");
-      status.textContent = "Uploaded ✓";
-    } else {
-      status.textContent = "Upload failed: " + (res.error || "unknown error");
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    
+    if (pendingUploadedImageUrls.length + files.length > 5) {
+      showToast("You can upload a maximum of 5 images per product.");
+      e.target.value = "";
+      return;
     }
-    e.target.value = "";
-  });
+    
+    const status = document.querySelector("[data-upload-status]");
+    status.textContent = `Uploading ${files.length} image(s)…`;
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const res = await window.DivaAdmin.adminUploadProductImage(file);
+        if (res.ok) {
+          pendingUploadedImageUrls.push(res.url);
+        } else {
+          status.textContent = `Upload failed for ${file.name}: ` + (res.error || "unknown error");
+          e.target.value = "";
+          return;
+        }
+    }
+    
+    getProductForm().querySelector('[data-field="imageUrl"]').value = pendingUploadedImageUrls[0] || "";
+    
+    // Re-render gallery
+    const gallery = document.querySelector("[data-image-gallery]");
+    gallery.innerHTML = "";
+    pendingUploadedImageUrls.forEach((url, idx) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "gallery-item";
+      wrapper.style.position = "relative";
+      wrapper.style.display = "inline-block";
+      wrapper.style.marginRight = "8px";
+      wrapper.style.marginBottom = "8px";
+      
+      const img = document.createElement("img");
+      img.src = url;
+      img.style.width = "60px";
+      img.style.height = "60px";
+      img.style.objectFit = "cover";
+      img.style.borderRadius = "4px";
+      
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.textContent = "×";
+      removeBtn.className = "remove-img-btn";
+      removeBtn.style.position = "absolute";
+      removeBtn.style.top = "-5px";
+      removeBtn.style.right = "-5px";
+      removeBtn.style.background = "#ff4d4f";
+      removeBtn.style.color = "#fff";
+      removeBtn.style.border = "none";
+      removeBtn.style.borderRadius = "50%";
+      removeBtn.style.width = "20px";
+      removeBtn.style.height = "20px";
+      removeBtn.style.cursor = "pointer";
+      removeBtn.style.fontSize = "14px";
+      removeBtn.style.lineHeight = "1";
+      removeBtn.onclick = () => {
+        pendingUploadedImageUrls.splice(idx, 1);
+        gallery.removeChild(wrapper);
+        getProductForm().querySelector('[data-field="imageUrl"]').value = pendingUploadedImageUrls[0] || "";
+      };
+      
+      wrapper.appendChild(img);
+      wrapper.appendChild(removeBtn);
+      gallery.appendChild(wrapper);
+    });
 
-  // Live preview when a URL is pasted by hand.
-  getProductForm().querySelector('[data-field="imageUrl"]').addEventListener("input", (e) => {
-    const preview = document.querySelector("[data-image-preview]");
-    if (e.target.value.trim()) { preview.src = e.target.value.trim(); preview.classList.remove("hidden"); }
-    else preview.classList.add("hidden");
+    status.textContent = "Uploaded ✓";
+    e.target.value = "";
   });
 
   // Video upload → Supabase Storage, fills the URL field + preview.
@@ -685,7 +796,8 @@ function initProductModal() {
     const payload = {
       name, category, price,
       compare_at: compareAt,
-      image_url: imageUrl,
+      image_url: pendingUploadedImageUrls[0] || "",
+      image_urls: pendingUploadedImageUrls,
       video_url: videoUrl || null,
       description,
       active,
